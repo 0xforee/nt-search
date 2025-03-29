@@ -8,20 +8,20 @@
 - [x] Create basic folder structure (components, pages, hooks, utils, types, etc.)
 
 ## 2. Type Definitions
-- [ ] Define TypeScript interfaces for:
-  - [ ] Movie data
-  - [ ] User data
-  - [ ] Download data
-  - [ ] Resource data
-  - [ ] API responses
+- [x] Define TypeScript interfaces for:
+  - [x] Movie data
+  - [x] User data
+  - [x] Download data
+  - [x] Resource data
+  - [x] API responses
 
 ## 3. Authentication System
-- [ ] Implement login page UI
-- [ ] Set up authentication context/provider
-- [ ] Create authentication hooks
-- [ ] Implement login functionality
-- [ ] Add form validation
-- [ ] Handle authentication state persistence
+- [x] Implement login page UI
+- [x] Set up authentication context/provider
+- [x] Create authentication hooks
+- [x] Implement login functionality
+- [x] Add form validation
+- [x] Handle authentication state persistence
 
 ## 4. Home Page
 - [ ] Create search bar component
