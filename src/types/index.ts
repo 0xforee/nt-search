@@ -112,4 +112,28 @@ export interface ModalProps {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
+}
+
+export interface SearchItem {
+  id: number;
+  title: string;
+  year: string | null;
+  type: string;
+  media_type: string;
+  vote: number;
+  image: string;
+  overview: string;
+  poster: string;
+  category: string;
+  original_title: string;
+  release_date: string;
+}
+
+export interface SearchResponse {
+  code: number;
+  success: boolean;
+  message: string;
+  data: {
+    Items: SearchItem[];
+  };
 } 
