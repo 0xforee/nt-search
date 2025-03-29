@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import { SearchItem } from '../types';
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState<SearchItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +62,11 @@ const SearchResultsPage: React.FC = () => {
     fetchResults();
   }, [query]);
 
+  const handleMovieClick = (id: number, type: string) => {
+    const mediaType = type === '动漫' || type === '电视剧' ? 'TV' : 'MOV';
+    navigate(`/movie/${id}?type=${mediaType}`);
+  };
+
   if (isLoading) {
     return (
       <MainLayout>
@@ -111,7 +117,8 @@ const SearchResultsPage: React.FC = () => {
             {results.map((result) => (
               <div 
                 key={result.id}
-                className="bg-gray-800 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200"
+                onClick={() => handleMovieClick(result.id, result.type)}
+                className="bg-gray-800 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200 cursor-pointer"
               >
                 <img 
                   src={result.poster} 

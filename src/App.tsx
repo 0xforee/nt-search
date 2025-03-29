@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import SearchResultsPage from './pages/SearchResultsPage';
+import MovieDetailsPage from './pages/MovieDetailsPage';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -39,6 +40,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <SearchResultsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/movie/:id" 
+        element={
+          <ProtectedRoute>
+            <MovieDetailsPage />
           </ProtectedRoute>
         } 
       />

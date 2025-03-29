@@ -136,4 +136,58 @@ export interface SearchResponse {
   data: {
     Items: SearchItem[];
   };
+}
+
+export interface MovieFact {
+  [key: string]: string;
+}
+
+export interface MovieCrew {
+  [key: string]: string;
+}
+
+export interface MovieActor {
+  id: number;
+  gender: number;
+  known_for_department: string;
+  name: string;
+  original_name: string;
+  popularity: number;
+  image: string;
+  cast_id: number;
+  role: string;
+  credit_id: string;
+  order: number;
+  profile: string;
+}
+
+export interface MovieDetails {
+  tmdbid: number;
+  douban_id: number;
+  background: string[];
+  image: string;
+  vote: number;
+  year: string;
+  title: string;
+  genres: string;
+  overview: string;
+  runtime: string;
+  fact: MovieFact[];
+  crews: MovieCrew[];
+  actors: MovieActor[];
+  link: string;
+  douban_link: string;
+  fav: string;
+  item_url: string | null;
+  rssid: string;
+  seasons: any[];
+}
+
+export interface MovieDetailsResponse {
+  code: number;
+  success: boolean;
+  message: string;
+  data: {
+    data: MovieDetails;
+  };
 } 
