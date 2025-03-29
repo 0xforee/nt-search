@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFormValidation } from '../hooks/useFormValidation';
@@ -13,7 +13,7 @@ const validationRules = {
   },
   password: {
     required: true,
-    minLength: 6,
+    minLength: 3,
     message: 'Password is required',
   },
 };
@@ -30,7 +30,14 @@ const LoginPage: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Validate on change
+    validateForm({ ...formData, [name]: value });
   };
+
+  useEffect(() => {
+    // Log validation state whenever it changes
+    console.log('Form validation state:', { isValid, errors, formData });
+  }, [isValid, errors, formData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

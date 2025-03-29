@@ -10,6 +10,20 @@ interface AuthContextType {
   isAuthenticated: boolean;
 }
 
+interface LoginResponse {
+  code: number;
+  success: boolean;
+  data: {
+    token: string;
+    apikey: string;
+    userinfo: {
+      userid: number;
+      username: string;
+      userpris: string[];
+    };
+  };
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
@@ -51,21 +65,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       setError(null);
       
-      // TODO: Implement actual API call
-      // For now, we'll simulate an API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const formData = new URLSearchParams();
+      formData.append('username', credentials.username);
+      formData.append('password', credentials.password);
+
+      const response = await fetch('http://localhost:3000/api/v1/user/login', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+      });
+
+      if (!response.ok) {
+        throw new Error('Login request failed');
+      }
+
+      const data: LoginResponse = await response.json();
       
-      // Simulate successful login
-      const mockUser: User = {
-        id: '1',
-        username: credentials.username,
-        email: `${credentials.username}@example.com`,
+      if (!data.success) {
+        throw new Error('Login failed');
+      }
+
+      // Store the token
+      localStorage.setItem('auth_token', data.data.token);
+      localStorage.setItem('apikey', data.data.apikey);
+
+      // Set user data
+      const userData: User = {
+        id: data.data.userinfo.userid.toString(),
+        username: data.data.userinfo.username,
+        email: `${data.data.userinfo.username}@example.com`,
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
+        permissions: data.data.userinfo.userpris,
       };
 
-      setUser(mockUser);
-      localStorage.setItem('auth_token', 'mock_token');
+      setUser(userData);
     } catch (err) {
       setError('Login failed. Please check your credentials.');
       throw err;
@@ -85,6 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(null);
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('apikey');
     } catch (err) {
       setError('Logout failed. Please try again.');
       throw err;
