@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import MovieDetailsPage from './pages/MovieDetailsPage';
+import MovieResourcesPage from './pages/MovieResourcesPage';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -48,6 +49,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <MovieDetailsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/movie/:id/resources" 
+        element={
+          <ProtectedRoute>
+            <MovieResourcesPage />
           </ProtectedRoute>
         } 
       />

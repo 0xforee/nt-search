@@ -1,0 +1,903 @@
+{
+    "code": 0,
+    "success": true,
+    "message": "",
+    "data": {
+      "total": 26,
+      "result": {
+        "阿甘正传 (1994)": {
+          "key": 1,
+          "title": "阿甘正传",
+          "year": "1994",
+          "type_key": "MOV",
+          "image": "https://assets.fanart.tv/fanart/movies/13/moviethumb/forrest-gump-523a8535e69fa.jpg",
+          "type": "电影",
+          "vote": "8.5",
+          "tmdbid": "13",
+          "backdrop": "https://assets.fanart.tv/fanart/movies/13/moviethumb/forrest-gump-523a8535e69fa.jpg",
+          "poster": "https://image.tmdb.org/t/p/w500/Ace1AhTTz2PQ2OVaX5mfZ7ey7Gv.jpg",
+          "overview": "阿甘于二战结束后不久出生在美国南方阿拉巴马州一个闭塞的小镇，他先天弱智，智商只有75，然而他的妈妈是一个性格坚强的女性，她常常鼓励阿甘“傻人有傻福”，要他自强不息。阿甘像普通孩子一样上学，并且认识了一生的朋友和至爱珍妮，在珍妮和妈妈的爱护下，阿甘凭着上帝赐予的“飞毛腿”开始了一生不停的奔跑。阿甘成为橄榄球巨星、越战英雄、乒乓球外交使者、亿万富翁，但是，他始终忘不了珍妮，几次匆匆的相聚和离别，更是加深了阿甘的思念。有一天，阿甘收到珍妮的信，他们终于又要见面…",
+          "fav": "0",
+          "rssid": "",
+          "torrent_dict": [
+            [
+              "MOV",
+              {
+                "1080p_bluray": {
+                  "group_info": {
+                    "respix": "1080p",
+                    "restype": "BluRay"
+                  },
+                  "group_total": 8,
+                  "group_torrents": {
+                    "1080p_bluray_x26510bit__726g_frds": {
+                      "unique_info": {
+                        "video_encode": "X265 10bit",
+                        "size": "7.26G",
+                        "reseffect": "",
+                        "releasegroup": "FRDS"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 1,
+                          "seeders": 453,
+                          "enclosure": "https://hdarea.club/download.php?id=48361",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 BluRay 1080p x265 10bit 2Audio MNHD-FRDS",
+                          "description": "阿甘正传Top250 #13 获奥斯卡6项大奖 国英双语 10bit HEVC版本",
+                          "pageurl": "https://hdarea.club/details.php?id=48361&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 1,
+                          "size": "7.26G",
+                          "respix": "1080p",
+                          "restype": "BluRay",
+                          "reseffect": "",
+                          "releasegroup": "FRDS",
+                          "video_encode": "X265 10bit",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "1080p_bluray_x265__726g_frds": {
+                      "unique_info": {
+                        "video_encode": "X265",
+                        "size": "7.26G",
+                        "reseffect": "",
+                        "releasegroup": "FRDS"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 2,
+                          "seeders": 387,
+                          "enclosure": "https://hdarea.club/download.php?id=127630",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 1080p BluRay x265 AC3 2Audio-MNHD-FRDS",
+                          "description": "阿甘正传 Top250 #13 获奥斯卡6项大奖 国英双语 10bit HEVC版本",
+                          "pageurl": "https://hdarea.club/details.php?id=127630&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 1,
+                          "size": "7.26G",
+                          "respix": "1080p",
+                          "restype": "BluRay",
+                          "reseffect": "",
+                          "releasegroup": "FRDS",
+                          "video_encode": "X265",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "1080p_bluray_x26510bit__929g_ade": {
+                      "unique_info": {
+                        "video_encode": "X265 10bit",
+                        "size": "9.29G",
+                        "reseffect": "",
+                        "releasegroup": "ADE"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 12,
+                          "seeders": 6,
+                          "enclosure": "https://hdarea.club/download.php?id=61407",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 1080p BluRay x265 10bit DTS-ADE",
+                          "description": "阿甘正传 / 福雷斯特·冈普 【简英|繁英|简|繁|英字幕】",
+                          "pageurl": "https://hdarea.club/details.php?id=61407&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0.5,
+                          "size": "9.29G",
+                          "respix": "1080p",
+                          "restype": "BluRay",
+                          "reseffect": "",
+                          "releasegroup": "ADE",
+                          "video_encode": "X265 10bit",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "1080p_bluray_x264__268g_hdhpad": {
+                      "unique_info": {
+                        "video_encode": "X264",
+                        "size": "2.68G",
+                        "reseffect": "",
+                        "releasegroup": "HDHPad"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 15,
+                          "seeders": 4,
+                          "enclosure": "https://hdarea.club/download.php?id=24362",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 BluRay 1080p iPad AAC x264-HDHPad",
+                          "description": "[阿甘正传][内嵌中字]",
+                          "pageurl": "https://hdarea.club/details.php?id=24362&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 1,
+                          "size": "2.68G",
+                          "respix": "1080p",
+                          "restype": "BluRay",
+                          "reseffect": "",
+                          "releasegroup": "HDHPad",
+                          "video_encode": "X264",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "1080p_bluray_x265__333g_none": {
+                      "unique_info": {
+                        "video_encode": "X265",
+                        "size": "3.33G",
+                        "reseffect": "",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 17,
+                          "seeders": 3,
+                          "enclosure": "https://hdarea.club/download.php?id=5799",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 Bluray 1080p x265 AAC 5.1 2Audios-GREENOTEA",
+                          "description": "阿甘正传 [HEVC/H.265蓝光压制|晓之绿HEVC豆瓣Top250: #3]",
+                          "pageurl": "https://hdarea.club/details.php?id=5799&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 1,
+                          "size": "3.33G",
+                          "respix": "1080p",
+                          "restype": "Bluray",
+                          "reseffect": "",
+                          "releasegroup": null,
+                          "video_encode": "X265",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "1080p_bluray_x264_uhdrepack_1769g_none": {
+                      "unique_info": {
+                        "video_encode": "X264",
+                        "size": "17.69G",
+                        "reseffect": "UHD REPACK",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 19,
+                          "seeders": 2,
+                          "enclosure": "https://hdarea.club/download.php?id=42135",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 REPACK 1080p UHD BluRay DD+ 7.1 x264-LoRD",
+                          "description": "阿甘正传 豆瓣9.5",
+                          "pageurl": "https://hdarea.club/details.php?id=42135&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 1,
+                          "size": "17.69G",
+                          "respix": "1080p",
+                          "restype": "BluRay",
+                          "reseffect": "UHD REPACK",
+                          "releasegroup": null,
+                          "video_encode": "X264",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "1080p_bluray_x264__1814g_none": {
+                      "unique_info": {
+                        "video_encode": "X264",
+                        "size": "18.14G",
+                        "reseffect": "",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 20,
+                          "seeders": 1,
+                          "enclosure": "https://hdarea.club/download.php?id=87178",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 1080p BluRay DD+7.1 x264-Geek",
+                          "description": "阿甘正传 第67届奥斯卡最佳影片/导演/男主角/改编剧本 | IMDb Top 250 #12 豆瓣Top250 #3 | 修复版 内封中字",
+                          "pageurl": "https://hdarea.club/details.php?id=87178&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0.5,
+                          "size": "18.14G",
+                          "respix": "1080p",
+                          "restype": "BluRay",
+                          "reseffect": "",
+                          "releasegroup": null,
+                          "video_encode": "X264",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "1080p_bluray_x264__1373g_hdh": {
+                      "unique_info": {
+                        "video_encode": "X264",
+                        "size": "13.73G",
+                        "reseffect": "",
+                        "releasegroup": "HDH"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 25,
+                          "seeders": 0,
+                          "enclosure": "https://hdarea.club/download.php?id=55471",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 1080p BluRay DTS-HDMA 5.1 2Audio x264-HDH",
+                          "description": "阿甘正传 | 第67届奥斯卡最佳影片/导演(罗伯特·泽米吉斯)/男主(汤姆·汉克斯）[国英双语]",
+                          "pageurl": "https://hdarea.club/details.php?id=55471&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 1,
+                          "size": "13.73G",
+                          "respix": "1080p",
+                          "restype": "BluRay",
+                          "reseffect": "",
+                          "releasegroup": "HDH",
+                          "video_encode": "X264",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                },
+                "_bluray": {
+                  "group_info": {
+                    "respix": "",
+                    "restype": "BluRay"
+                  },
+                  "group_total": 1,
+                  "group_torrents": {
+                    "_bluray_x264__1458g_cmct": {
+                      "unique_info": {
+                        "video_encode": "X264",
+                        "size": "14.58G",
+                        "reseffect": "",
+                        "releasegroup": "CMCT"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 3,
+                          "seeders": 99,
+                          "enclosure": "https://hdarea.club/download.php?id=5067",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 BluRay 4Audios x264 MiniBD1080p-CMCT",
+                          "description": "阿甘正传/福雷斯特·冈普/亚甘正传/阿甘正传(台)/阿甘正传(港) [国英导三语/双导评] [简繁英导SUP特效字幕]",
+                          "pageurl": "https://hdarea.club/details.php?id=5067&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 1,
+                          "size": "14.58G",
+                          "respix": "",
+                          "restype": "BluRay",
+                          "reseffect": "",
+                          "releasegroup": "CMCT",
+                          "video_encode": "X264",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                },
+                "2160p_bluray": {
+                  "group_info": {
+                    "respix": "2160p",
+                    "restype": "Bluray"
+                  },
+                  "group_total": 7,
+                  "group_torrents": {
+                    "2160p_bluray_x26510bit_hdr_2263g_frds": {
+                      "unique_info": {
+                        "video_encode": "X265 10bit",
+                        "size": "22.63G",
+                        "reseffect": "HDR",
+                        "releasegroup": "FRDS"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 4,
+                          "seeders": 88,
+                          "enclosure": "https://hdarea.club/download.php?id=16745",
+                          "site": "HDArea",
+                          "torrent_name": "阿甘正传 Forrest Gump 1994 Bluray 2160p x265 10bit HDR 5Audios mUHD-FRDS",
+                          "description": "【阿甘正传/福雷斯特·冈普】 mUHD作品 4k HDR10版本 重制版本",
+                          "pageurl": "https://hdarea.club/details.php?id=16745&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 0.5,
+                          "size": "22.63G",
+                          "respix": "2160p",
+                          "restype": "Bluray",
+                          "reseffect": "HDR",
+                          "releasegroup": "FRDS",
+                          "video_encode": "X265 10bit",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluray_x26510bit_doviuhd_5471g_beast": {
+                      "unique_info": {
+                        "video_encode": "X265 10bit",
+                        "size": "54.71G",
+                        "reseffect": "DoVi UHD",
+                        "releasegroup": "beAst"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 6,
+                          "seeders": 58,
+                          "enclosure": "https://hdarea.club/download.php?id=93393",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 UHD BluRay 2160p 10bit DoVi 5Audio TrueHD Atmos 7.1 x265-beAst",
+                          "description": "阿甘正传 /国粤英五音轨TrueHD7.1/英简繁&双语特效SUP字幕/章节/杜比p7双层",
+                          "pageurl": "https://hdarea.club/details.php?id=93393&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 0,
+                          "size": "54.71G",
+                          "respix": "2160p",
+                          "restype": "BluRay",
+                          "reseffect": "DoVi UHD",
+                          "releasegroup": "beAst",
+                          "video_encode": "X265 10bit",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluray_x26510bit_hdruhd_4732g_beast": {
+                      "unique_info": {
+                        "video_encode": "X265 10bit",
+                        "size": "47.32G",
+                        "reseffect": "HDR UHD",
+                        "releasegroup": "beAst"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 10,
+                          "seeders": 15,
+                          "enclosure": "https://hdarea.club/download.php?id=93387",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 UHD BluRay 2160p 10bit HDR 5Audio TrueHD Atmos 7.1 x265-beAst",
+                          "description": "阿甘正传 /国粤英五音轨TrueHD7.1/英简繁&双语特效SUP字幕/章节/HDR10",
+                          "pageurl": "https://hdarea.club/details.php?id=93387&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 1,
+                          "size": "47.32G",
+                          "respix": "2160p",
+                          "restype": "BluRay",
+                          "reseffect": "HDR UHD",
+                          "releasegroup": "beAst",
+                          "video_encode": "X265 10bit",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluray_hevc_uhd_9156g_none": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "91.56G",
+                        "reseffect": "UHD",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 11,
+                          "seeders": 14,
+                          "enclosure": "https://hdarea.club/download.php?id=49020",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 2160p EUR UHD Blu-ray HEVC TrueHD 7.1-COASTER",
+                          "description": "阿甘正传/福雷斯特·冈普 *4K原盘* 【欧版原盘】",
+                          "pageurl": "https://hdarea.club/details.php?id=49020&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 0,
+                          "size": "91.56G",
+                          "respix": "2160p",
+                          "restype": "BluRay",
+                          "reseffect": "UHD",
+                          "releasegroup": null,
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluray_x26510bit_hdruhd_3142g_beitai": {
+                      "unique_info": {
+                        "video_encode": "X265 10bit",
+                        "size": "31.42G",
+                        "reseffect": "HDR UHD",
+                        "releasegroup": "BeiTai"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 13,
+                          "seeders": 6,
+                          "enclosure": "https://hdarea.club/download.php?id=23369",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 UHD BluRay 2160p 2Audio TrueHD Atmos 7.1 x265.10bit HDR-BeiTai",
+                          "description": "阿甘正传 国英双语TrueHD7.1/原盘英简繁SUP字幕/章节",
+                          "pageurl": "https://hdarea.club/details.php?id=23369&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 0.5,
+                          "size": "31.42G",
+                          "respix": "2160p",
+                          "restype": "BluRay",
+                          "reseffect": "HDR UHD",
+                          "releasegroup": "BeiTai",
+                          "video_encode": "X265 10bit",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluray_hevc_uhd_8985g_none": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "89.85G",
+                        "reseffect": "UHD",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 16,
+                          "seeders": 4,
+                          "enclosure": "https://hdarea.club/download.php?id=18100",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 2160p CEE UHD Blu-ray HEVC TrueHD 7.1-FLAME",
+                          "description": "阿甘正传/福雷斯特·冈普 [4K原盘 国语中字]",
+                          "pageurl": "https://hdarea.club/details.php?id=18100&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0.5,
+                          "size": "89.85G",
+                          "respix": "2160p",
+                          "restype": "BluRay",
+                          "reseffect": "UHD",
+                          "releasegroup": null,
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluray_hevc_hdrdvremuxuhd_7931g_none": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "79.31G",
+                        "reseffect": "HDR DV REMUX UHD",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 18,
+                          "seeders": 2,
+                          "enclosure": "https://hdarea.club/download.php?id=55431",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 2160p UHD BluRay REMUX DV HDR HEVC Atmos-TRiToN",
+                          "description": "阿甘正传 Forrest Gump (1994) | 导演: 罗伯特·泽米吉斯 | 编剧: 艾瑞克·罗斯 / 温斯顿·格鲁姆",
+                          "pageurl": "https://hdarea.club/details.php?id=55431&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 0.3,
+                          "size": "79.31G",
+                          "respix": "2160p",
+                          "restype": "BluRay",
+                          "reseffect": "HDR DV REMUX UHD",
+                          "releasegroup": null,
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                },
+                "1080p_bluraydiy": {
+                  "group_info": {
+                    "respix": "1080p",
+                    "restype": "BluRay DIY"
+                  },
+                  "group_total": 1,
+                  "group_torrents": {
+                    "1080p_bluraydiy_avc__4004g_cmct": {
+                      "unique_info": {
+                        "video_encode": "AVC",
+                        "size": "40.04G",
+                        "reseffect": "",
+                        "releasegroup": "CMCT"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 5,
+                          "seeders": 64,
+                          "enclosure": "https://hdarea.club/download.php?id=2865",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 Blu-Ray 1080p AVC DTS-HD MA5.1-CMCT",
+                          "description": "阿甘正传/福雷斯特·冈普/亚甘正传 [原盘DIY] [三国语] [简/繁/双语/纯特效/导评/花絮/全部中字]",
+                          "pageurl": "https://hdarea.club/details.php?id=2865&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 0,
+                          "size": "40.04G",
+                          "respix": "1080p",
+                          "restype": "BluRay DIY",
+                          "reseffect": "",
+                          "releasegroup": "CMCT",
+                          "video_encode": "AVC",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                },
+                "2160p_bluraydiy": {
+                  "group_info": {
+                    "respix": "2160p",
+                    "restype": "BluRay DIY"
+                  },
+                  "group_total": 5,
+                  "group_torrents": {
+                    "2160p_bluraydiy_hevc_uhd_9209g_chdbits": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "92.09G",
+                        "reseffect": "UHD",
+                        "releasegroup": "CHDBits"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 7,
+                          "seeders": 33,
+                          "enclosure": "https://hdarea.club/download.php?id=36254",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 UHD BluRay 2160p HEVC TrueHD 7 1-LianHH@CHDBits",
+                          "description": "阿甘正传/福雷斯特·冈普 UHD-DIY BDJ菜单修改 国语配音、简繁双语特效字幕、导评字幕、保留Dolby Vision",
+                          "pageurl": "https://hdarea.club/details.php?id=36254&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0.5,
+                          "size": "92.09G",
+                          "respix": "2160p",
+                          "restype": "BluRay DIY",
+                          "reseffect": "UHD",
+                          "releasegroup": "CHDBits",
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluraydiy_hevc_uhd_9209g_none": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "92.09G",
+                        "reseffect": "UHD",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 8,
+                          "seeders": 32,
+                          "enclosure": "https://hdarea.club/download.php?id=23105",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 UHD BluRay 2160p HEVC TrueHD 7 1-LianHH%40CHDBits iso",
+                          "description": "阿甘正传/福雷斯特·冈普 [UHD-DIY BDJ菜单修改 国语配音、简繁双语特效字幕、导评字幕、保留Dolby Vision]|Forrest Gump",
+                          "pageurl": "https://hdarea.club/details.php?id=23105&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 1,
+                          "size": "92.09G",
+                          "respix": "2160p",
+                          "restype": "BluRay DIY",
+                          "reseffect": "UHD",
+                          "releasegroup": null,
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluraydiy_hevc_uhd_9202g_none": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "92.02G",
+                        "reseffect": "UHD",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 21,
+                          "seeders": 1,
+                          "enclosure": "https://hdarea.club/download.php?id=73666",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 2160p EUR UHD Blu-ray HEVC Atmos TrueHD 7.1-DIY@iHDBits",
+                          "description": "阿甘正传/福雷斯特·冈普 | 【DIY】国语配音 | 简繁双语特效字幕",
+                          "pageurl": "https://hdarea.club/details.php?id=73666&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0.5,
+                          "size": "92.02G",
+                          "respix": "2160p",
+                          "restype": "BluRay DIY",
+                          "reseffect": "UHD",
+                          "releasegroup": null,
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluraydiy_hevc_uhd_9162g_hdhome": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "91.62G",
+                        "reseffect": "UHD",
+                        "releasegroup": "HDHome"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 22,
+                          "seeders": 1,
+                          "enclosure": "https://hdarea.club/download.php?id=39260",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 2160p UHD BluRay HEVC Atoms TrueHD 7.1-DIY@HDHome",
+                          "description": "[阿甘正传/福雷斯特·冈普][DIY R3TW简繁字幕]【保留Dolby Vision】",
+                          "pageurl": "https://hdarea.club/details.php?id=39260&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0.5,
+                          "size": "91.62G",
+                          "respix": "2160p",
+                          "restype": "BluRay DIY",
+                          "reseffect": "UHD",
+                          "releasegroup": "HDHome",
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    },
+                    "2160p_bluraydiy_hevc_uhd_9021g_none": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "90.21G",
+                        "reseffect": "UHD",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 23,
+                          "seeders": 0,
+                          "enclosure": "https://hdarea.club/download.php?id=73643",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 2160p CEE UHD Blu-ray HEVC Atmos TrueHD 7.1-DIY@iHDBits",
+                          "description": "阿甘正传/福雷斯特·冈普 | DIY国语配音 | 简繁+简繁双语特效字幕",
+                          "pageurl": "https://hdarea.club/details.php?id=73643&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0.5,
+                          "size": "90.21G",
+                          "respix": "2160p",
+                          "restype": "BluRay DIY",
+                          "reseffect": "UHD",
+                          "releasegroup": null,
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                },
+                "2160p_webdl": {
+                  "group_info": {
+                    "respix": "2160p",
+                    "restype": "WEB-DL"
+                  },
+                  "group_total": 1,
+                  "group_torrents": {
+                    "2160p_webdl_hevc__729g_none": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "7.29G",
+                        "reseffect": "",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 9,
+                          "seeders": 25,
+                          "enclosure": "https://hdarea.club/download.php?id=117680",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 WEB-DL 2160p HEVC AAC-ZmWeb",
+                          "description": "阿甘正传 / 福雷斯特·冈普 | 导演：罗伯特泽米吉斯 | 主演：汤姆汉克斯 / 罗宾怀特 / 加里西尼斯 *60FPS*",
+                          "pageurl": "https://hdarea.club/details.php?id=117680&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0,
+                          "size": "7.29G",
+                          "respix": "2160p",
+                          "restype": "WEB-DL",
+                          "reseffect": "",
+                          "releasegroup": null,
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                },
+                "2160p_": {
+                  "group_info": {
+                    "respix": "2160p",
+                    "restype": ""
+                  },
+                  "group_total": 1,
+                  "group_torrents": {
+                    "2160p__hevc_doviremuxuhd_8012g_none": {
+                      "unique_info": {
+                        "video_encode": "HEVC",
+                        "size": "80.12G",
+                        "reseffect": "DoVi Remux UHD",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 14,
+                          "seeders": 4,
+                          "enclosure": "https://hdarea.club/download.php?id=99569",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 2160p UHD Remux HEVC DoVi TrueHD Atmos 7 1-playBD",
+                          "description": "阿甘正传 / 福雷斯特·冈普",
+                          "pageurl": "https://hdarea.club/details.php?id=99569&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 0,
+                          "size": "80.12G",
+                          "respix": "2160p",
+                          "restype": "",
+                          "reseffect": "DoVi Remux UHD",
+                          "releasegroup": null,
+                          "video_encode": "HEVC",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                },
+                "_bdrip": {
+                  "group_info": {
+                    "respix": "",
+                    "restype": "BDRip"
+                  },
+                  "group_total": 1,
+                  "group_torrents": {
+                    "_bdrip___102g_tlf": {
+                      "unique_info": {
+                        "video_encode": "",
+                        "size": "1.02G",
+                        "reseffect": "",
+                        "releasegroup": "TLF"
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 24,
+                          "seeders": 0,
+                          "enclosure": "https://hdarea.club/download.php?id=62749",
+                          "site": "HDArea",
+                          "torrent_name": "Top038.阿甘正传.Forrest.Gump.1994.BDRip.2Audio.MiniSD-TLF",
+                          "description": "阿甘正传 TLF小体积",
+                          "pageurl": "https://hdarea.club/details.php?id=62749&hit=1",
+                          "uploadvalue": 2,
+                          "downloadvalue": 0.5,
+                          "size": "1.02G",
+                          "respix": "",
+                          "restype": "BDRip",
+                          "reseffect": "",
+                          "releasegroup": "TLF",
+                          "video_encode": "",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                },
+                "720p_bluray": {
+                  "group_info": {
+                    "respix": "720p",
+                    "restype": "BluRay"
+                  },
+                  "group_total": 1,
+                  "group_torrents": {
+                    "720p_bluray_x264__957g_none": {
+                      "unique_info": {
+                        "video_encode": "X264",
+                        "size": "9.57G",
+                        "reseffect": "",
+                        "releasegroup": null
+                      },
+                      "torrent_list": [
+                        {
+                          "id": 26,
+                          "seeders": 0,
+                          "enclosure": "https://hdarea.club/download.php?id=6187",
+                          "site": "HDArea",
+                          "torrent_name": "Forrest Gump 1994 720p BluRay DTS x264-HDWinG",
+                          "description": "阿甘正传/福雷斯特·冈普 全世界家喻户晓的故事",
+                          "pageurl": "https://hdarea.club/details.php?id=6187&hit=1",
+                          "uploadvalue": 1,
+                          "downloadvalue": 1,
+                          "size": "9.57G",
+                          "respix": "720p",
+                          "restype": "BluRay",
+                          "reseffect": "",
+                          "releasegroup": null,
+                          "video_encode": "X264",
+                          "labels": []
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          ],
+          "filter": {
+            "site": [
+              "HDArea"
+            ],
+            "free": [
+              {
+                "value": "2.0 1.0",
+                "name": "2X"
+              },
+              {
+                "value": "1.0 1.0",
+                "name": "普通"
+              },
+              {
+                "value": "1.0 0.5",
+                "name": "50%"
+              },
+              {
+                "value": "1.0 0.0",
+                "name": "免费"
+              },
+              {
+                "value": "2.0 0.5",
+                "name": "2X 50%"
+              },
+              {
+                "value": "2.0 0.0",
+                "name": "2X免费"
+              },
+              {
+                "value": "1.0 0.3",
+                "name": "30%"
+              }
+            ],
+            "releasegroup": [
+              "ADE",
+              "BeiTai",
+              "CHDBits",
+              "CMCT",
+              "FRDS",
+              "HDH",
+              "HDHPad",
+              "HDHome",
+              "TLF",
+              "beAst",
+              "未知"
+            ],
+            "respix": [
+              "1080p",
+              "未知分辨率",
+              "2160p",
+              "720p"
+            ],
+            "video": [
+              "X265 10bit",
+              "X265",
+              "X264",
+              "AVC",
+              "HEVC"
+            ],
+            "season": []
+          }
+        }
+      }
+    }
+  }
