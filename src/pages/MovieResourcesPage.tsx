@@ -99,7 +99,7 @@ const mockData: { [key: string]: MovieData } = {
 const MovieResourcesPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addDownload } = useDownload();
+  const { startDownload } = useDownload();
   const [movie, setMovie] = useState<MovieData | null>(null);
   const [resources, setResources] = useState<TorrentResource[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -124,20 +124,20 @@ const MovieResourcesPage: React.FC = () => {
 
   const handleDownload = async (resource: TorrentResource) => {
     try {
-      // Add download to the download context
-      addDownload({
-        resourceId: resource.id.toString(),
-        movieId: id || '',
-        status: 'downloading',
-        progress: 0,
-        speed: 0,
-        filePath: `/downloads/${resource.torrent_name}.torrent`
-      });
+      // Show loading state
+      setIsLoading(true);
+      
+      // Start the download using the API service
+      await startDownload(resource.id.toString(), id || '');
       
       // Navigate to downloads page
       navigate('/downloads');
     } catch (err) {
       console.error('Download error:', err);
+      // Show error message to user
+      setError('Failed to start download. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -253,4 +253,4 @@ const MovieResourcesPage: React.FC = () => {
   );
 };
 
-export default MovieResourcesPage; 
+export default MovieResourcesPage;
