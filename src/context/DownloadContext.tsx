@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads } from '../services/downloadService';
+import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads, getDownloadHistory } from '../services/downloadService';
 import { Download } from '../types';
 
 interface DownloadContextType {
   activeDownloads: Download[];
   downloadHistory: Download[];
+  apiDownloadHistory: any[];
   addDownload: (download: Omit<Download, 'id' | 'startedAt'>) => Promise<string>;
   cancelDownload: (downloadId: string) => Promise<void>;
   retryDownload: (download: Download) => Promise<void>;
@@ -13,6 +14,9 @@ interface DownloadContextType {
   failDownload: (downloadId: string, error: string) => void;
   startDownload: (resourceId: string, movieId: string) => Promise<string>;
   fetchActiveDownloads: () => Promise<void>;
+  fetchDownloadHistory: (page?: number) => Promise<void>;
+  currentHistoryPage: number;
+  totalHistoryPages: number;
 }
 
 const DownloadContext = createContext<DownloadContextType | undefined>(undefined);
@@ -28,6 +32,9 @@ export const useDownload = () => {
 export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeDownloads, setActiveDownloads] = useState<Download[]>([]);
   const [downloadHistory, setDownloadHistory] = useState<Download[]>([]);
+  const [apiDownloadHistory, setApiDownloadHistory] = useState<any[]>([]);
+  const [currentHistoryPage, setCurrentHistoryPage] = useState<number>(1);
+  const [totalHistoryPages, setTotalHistoryPages] = useState<number>(1);
 
   const addDownload = useCallback(async (download: Omit<Download, 'id' | 'startedAt'>) => {
     try {
@@ -226,9 +233,27 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return () => clearInterval(pollingInterval);
   }, [activeDownloads, pollDownloadProgress]);
   
-  // Fetch active downloads when component mounts
+  // Function to fetch download history from the API
+  const fetchDownloadHistory = useCallback(async (page: number = 1) => {
+    try {
+      const response = await getDownloadHistory(page);
+      
+      if (response && response.success && response.data && response.data.Items) {
+        setApiDownloadHistory(response.data.Items);
+        setCurrentHistoryPage(page);
+        // In a real API, there would likely be pagination info
+        // For now, we'll just assume there's only one page if we have results
+        setTotalHistoryPages(response.data.Items.length > 0 ? 2 : 1);
+      }
+    } catch (error) {
+      console.error('Error fetching download history:', error);
+    }
+  }, []);
+
+  // Fetch active downloads and history when component mounts
   useEffect(() => {
     fetchActiveDownloads();
+    fetchDownloadHistory();
     
     // Set up periodic refresh of active downloads
     const refreshInterval = setInterval(() => {
@@ -236,7 +261,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }, 30000); // Refresh every 30 seconds
     
     return () => clearInterval(refreshInterval);
-  }, [fetchActiveDownloads]);
+  }, [fetchActiveDownloads, fetchDownloadHistory]);
 
   const completeDownload = useCallback((downloadId: string) => {
     setActiveDownloads(prev => {
@@ -297,6 +322,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         activeDownloads,
         downloadHistory,
+        apiDownloadHistory,
         addDownload,
         cancelDownload,
         retryDownload,
@@ -304,7 +330,10 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         completeDownload,
         failDownload,
         startDownload,
-        fetchActiveDownloads
+        fetchActiveDownloads,
+        fetchDownloadHistory,
+        currentHistoryPage,
+        totalHistoryPages
       }}
     >
       {children}

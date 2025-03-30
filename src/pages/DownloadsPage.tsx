@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import { useDownload } from '../context/DownloadContext';
@@ -9,15 +9,22 @@ const DownloadsPage: React.FC = () => {
   const { 
     activeDownloads, 
     downloadHistory, 
+    apiDownloadHistory,
     cancelDownload, 
     retryDownload,
     updateDownloadProgress,
-    fetchActiveDownloads 
+    fetchActiveDownloads,
+    fetchDownloadHistory,
+    currentHistoryPage,
+    totalHistoryPages
   } = useDownload();
+  
+  const [historyPage, setHistoryPage] = useState(1);
 
-  // Fetch active downloads when component mounts
+  // Fetch active downloads and history when component mounts
   useEffect(() => {
     fetchActiveDownloads();
+    fetchDownloadHistory(historyPage);
     
     // Set up polling for active downloads
     const interval = setInterval(() => {
@@ -25,7 +32,7 @@ const DownloadsPage: React.FC = () => {
     }, 10000); // Refresh every 10 seconds
     
     return () => clearInterval(interval);
-  }, [fetchActiveDownloads]);
+  }, [fetchActiveDownloads, fetchDownloadHistory, historyPage]);
 
   const formatFileSize = (bytes: number): string => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -109,16 +116,12 @@ const DownloadsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Download History */}
-        <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Download History</h2>
-          <div className="space-y-4">
-            {downloadHistory.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">
-                No download history
-              </div>
-            ) : (
-              downloadHistory.map(download => {
+        {/* Local Download History */}
+        {downloadHistory.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-white mb-4">Recent Downloads</h2>
+            <div className="space-y-4">
+              {downloadHistory.map(download => {
                 // Extract title and image from the download object if available
                 const title = (download as any).title || 'Movie Title';
                 const image = (download as any).image || '';
@@ -151,7 +154,84 @@ const DownloadsPage: React.FC = () => {
                     </div>
                   </div>
                 );
+              })}
+            </div>
+          </div>
+        )}
+        
+        {/* API Download History */}
+        <div>
+          <h2 className="text-lg font-semibold text-white mb-4">Download History</h2>
+          <div className="space-y-4">
+            {apiDownloadHistory.length === 0 ? (
+              <div className="text-center text-gray-400 py-8">
+                No download history
+              </div>
+            ) : (
+              apiDownloadHistory.map((item: any) => {
+                return (
+                  <div key={item.id} className="bg-gray-800 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {item.image ? (
+                          <img src={item.image} alt={item.title} className="w-8 h-12 object-cover rounded" />
+                        ) : (
+                          <div className="w-8 h-12 bg-gray-700 rounded"></div>
+                        )}
+                        <div>
+                          <h3 className="text-white text-sm">{item.title}</h3>
+                          <p className="text-gray-400 text-xs">
+                            {item.media_type} • {item.year} • {item.site}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-1 line-clamp-2">
+                            {item.overview}
+                          </p>
+                          <p className="text-gray-400 text-xs mt-1">
+                            Downloaded on {item.date}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
               })
+            )}
+            
+            {/* Pagination */}
+            {apiDownloadHistory.length > 0 && totalHistoryPages > 1 && (
+              <div className="flex justify-center mt-6">
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => {
+                      if (historyPage > 1) {
+                        const newPage = historyPage - 1;
+                        setHistoryPage(newPage);
+                        fetchDownloadHistory(newPage);
+                      }
+                    }}
+                    disabled={historyPage <= 1}
+                    className={`px-3 py-1 rounded ${historyPage <= 1 ? 'bg-gray-700 text-gray-500' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
+                  >
+                    Previous
+                  </button>
+                  <span className="px-3 py-1 bg-gray-700 rounded text-white">
+                    {historyPage} / {totalHistoryPages}
+                  </span>
+                  <button
+                    onClick={() => {
+                      if (historyPage < totalHistoryPages) {
+                        const newPage = historyPage + 1;
+                        setHistoryPage(newPage);
+                        fetchDownloadHistory(newPage);
+                      }
+                    }}
+                    disabled={historyPage >= totalHistoryPages}
+                    className={`px-3 py-1 rounded ${historyPage >= totalHistoryPages ? 'bg-gray-700 text-gray-500' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>

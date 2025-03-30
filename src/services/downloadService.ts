@@ -1,6 +1,30 @@
 import { apiRequest } from './api';
 import { Download } from '../types';
 
+interface DownloadHistoryItem {
+  id: string;
+  orgid: string;
+  tmdbid: string;
+  title: string;
+  type: string;
+  media_type: string;
+  year: string;
+  vote: string;
+  image: string;
+  overview: string;
+  date: string;
+  site: string;
+}
+
+interface DownloadHistoryResponse {
+  code: number;
+  success: boolean;
+  message: string;
+  data: {
+    Items: DownloadHistoryItem[];
+  };
+}
+
 interface DownloadSearchResponse {
   code: number;
   success: boolean;
@@ -58,5 +82,18 @@ export async function cancelDownloadRequest(downloadId: string): Promise<any> {
 export async function getActiveDownloads(): Promise<any> {
   return apiRequest('/download/now', {
     method: 'POST'
+  });
+}
+
+/**
+ * Gets the download history with pagination
+ * @param page The page number to fetch
+ * @returns Promise with download history information
+ */
+export async function getDownloadHistory(page: number = 1): Promise<DownloadHistoryResponse> {
+  return apiRequest<DownloadHistoryResponse>('/download/history', {
+    method: 'POST',
+    urlEncoded: true,
+    body: { page }
   });
 }
