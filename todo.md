@@ -47,20 +47,20 @@
 - [x] Add back button functionality
 
 ## 7. Movie Resources Page
-- [ ] Create resource list component
-- [ ] Implement resource item component
-- [ ] Add download functionality
-- [ ] Create quality selection
-- [ ] Add file size display
-- [ ] Implement back button
+- [x] Create resource list component
+- [x] Implement resource item component
+- [x] Add download functionality
+- [x] Create quality selection
+- [x] Add file size display
+- [x] Implement back button
 
 ## 8. Download Management
-- [ ] Create download progress tracking
-- [ ] Implement download queue
-- [ ] Add download history
-- [ ] Create download status indicators
-- [ ] Implement pause/resume functionality
-- [ ] Add download speed display
+- [x] Create download progress tracking
+- [x] Implement download queue
+- [x] Add download history
+- [x] Create download status indicators
+- [x] Implement pause/resume functionality
+- [x] Add download speed display
 
 ## 9. UI Components
 - [x] Create reusable button components

@@ -1,78 +1,75 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { DownloadProvider } from './context/DownloadContext';
+import MainLayout from './layouts/MainLayout';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import MovieDetailsPage from './pages/MovieDetailsPage';
 import MovieResourcesPage from './pages/MovieResourcesPage';
+import DownloadsPage from './pages/DownloadsPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
-// Protected Route component
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-function AppRoutes() {
-  return (
-    <Routes>
-      <Route 
-        path="/" 
-        element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/search" 
-        element={
-          <ProtectedRoute>
-            <SearchResultsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/movie/:id" 
-        element={
-          <ProtectedRoute>
-            <MovieDetailsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/movie/:id/resources" 
-        element={
-          <ProtectedRoute>
-            <MovieResourcesPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route path="/login" element={<LoginPage />} />
-    </Routes>
-  );
-}
-
-function App() {
+const AppRoutes: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
-        <AppRoutes />
+        <DownloadProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <HomePage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <SearchResultsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/movie/:id"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <MovieDetailsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/movie/:id/resources"
+              element={
+                <ProtectedRoute>
+                  <MovieResourcesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/downloads"
+              element={
+                <ProtectedRoute>
+                  <DownloadsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </DownloadProvider>
       </AuthProvider>
     </Router>
   );
-}
+};
 
-export default App;
+export default AppRoutes;

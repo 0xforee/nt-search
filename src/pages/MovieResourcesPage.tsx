@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
+import { useDownload } from '../context/DownloadContext';
 
 interface TorrentResource {
   id: number;
@@ -98,6 +99,7 @@ const mockData: { [key: string]: MovieData } = {
 const MovieResourcesPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { addDownload } = useDownload();
   const [movie, setMovie] = useState<MovieData | null>(null);
   const [resources, setResources] = useState<TorrentResource[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -122,14 +124,18 @@ const MovieResourcesPage: React.FC = () => {
 
   const handleDownload = async (resource: TorrentResource) => {
     try {
-      // Simulate download request
-      console.log('Starting download:', resource.torrent_name);
-      console.log('Magnet link:', resource.enclosure);
+      // Add download to the download context
+      addDownload({
+        resourceId: resource.id.toString(),
+        movieId: id || '',
+        status: 'downloading',
+        progress: 0,
+        speed: 0,
+        filePath: `/downloads/${resource.torrent_name}.torrent`
+      });
       
-      // Navigate to downloads page after a short delay
-      setTimeout(() => {
-        navigate('/downloads');
-      }, 1000);
+      // Navigate to downloads page
+      navigate('/downloads');
     } catch (err) {
       console.error('Download error:', err);
     }
