@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { initiateDownload, trackDownloadProgress, cancelDownloadRequest } from '../services/downloadService';
+import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads } from '../services/downloadService';
 import { Download } from '../types';
 
 interface DownloadContextType {
@@ -12,6 +12,7 @@ interface DownloadContextType {
   completeDownload: (downloadId: string) => void;
   failDownload: (downloadId: string, error: string) => void;
   startDownload: (resourceId: string, movieId: string) => Promise<string>;
+  fetchActiveDownloads: () => Promise<void>;
 }
 
 const DownloadContext = createContext<DownloadContextType | undefined>(undefined);
@@ -167,6 +168,49 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return null;
   }, []);
   
+  // Function to fetch all active downloads from the server
+  const fetchActiveDownloads = useCallback(async () => {
+    try {
+      const response = await getActiveDownloads();
+      
+      if (response && response.success && response.data && response.data.result) {
+        // Map the server response to our Download type
+        const serverDownloads = response.data.result.map((item: any) => {
+          // Parse progress to number if it's a string
+          let progress = typeof item.progress === 'number' ? item.progress : 0;
+          if (typeof item.progress === 'string') {
+            const progressNum = parseFloat(item.progress);
+            if (!isNaN(progressNum)) {
+              progress = progressNum;
+            }
+          }
+          
+          // Map API response to our Download type
+          return {
+            id: item.id,
+            resourceId: item.id, // Using id as resourceId if not provided
+            movieId: item.id, // Using id as movieId if not provided
+            status: item.state === 'Stoped' ? 'paused' : 'downloading',
+            progress: progress,
+            speed: item.speed || 0,
+            startedAt: new Date().toISOString(),
+            // Additional fields from API response
+            name: item.name,
+            title: item.title,
+            image: item.image,
+            state: item.state,
+            site_url: item.site_url
+          } as Download & { name: string; title: string; image: string; state: string; site_url: string };
+        });
+        
+        // Update the active downloads state
+        setActiveDownloads(serverDownloads);
+      }
+    } catch (error) {
+      console.error('Error fetching active downloads:', error);
+    }
+  }, []);
+
   // Set up polling for active downloads
   useEffect(() => {
     if (activeDownloads.length === 0) return;
@@ -181,6 +225,18 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     return () => clearInterval(pollingInterval);
   }, [activeDownloads, pollDownloadProgress]);
+  
+  // Fetch active downloads when component mounts
+  useEffect(() => {
+    fetchActiveDownloads();
+    
+    // Set up periodic refresh of active downloads
+    const refreshInterval = setInterval(() => {
+      fetchActiveDownloads();
+    }, 30000); // Refresh every 30 seconds
+    
+    return () => clearInterval(refreshInterval);
+  }, [fetchActiveDownloads]);
 
   const completeDownload = useCallback((downloadId: string) => {
     setActiveDownloads(prev => {
@@ -216,7 +272,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return prev;
     });
   }, []);
-
+  
   // Function to start a download from a resource ID
   const startDownload = useCallback(async (resourceId: string, movieId: string) => {
     try {
@@ -247,7 +303,8 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         updateDownloadProgress,
         completeDownload,
         failDownload,
-        startDownload
+        startDownload,
+        fetchActiveDownloads
       }}
     >
       {children}

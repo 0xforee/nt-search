@@ -50,3 +50,13 @@ export async function cancelDownloadRequest(downloadId: string): Promise<any> {
     method: 'POST'
   });
 }
+
+/**
+ * Gets a list of all active downloads
+ * @returns Promise with active downloads information
+ */
+export async function getActiveDownloads(): Promise<any> {
+  return apiRequest('/download/now', {
+    method: 'POST'
+  });
+}
