@@ -12,6 +12,7 @@ const DownloadsPage: React.FC = () => {
     apiDownloadHistory,
     cancelDownload, 
     retryDownload,
+    removeDownload,
     updateDownloadProgress,
     fetchActiveDownloads,
     fetchDownloadHistory,
@@ -88,14 +89,22 @@ const DownloadsPage: React.FC = () => {
                           <p className="text-gray-400 text-xs">{name}</p>
                         </div>
                       </div>
-                      <button 
-                        onClick={() => cancelDownload(download.id)}
-                        className="text-gray-400 hover:text-white transition-colors"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => cancelDownload(download.id)}
+                          className="text-gray-400 hover:text-white transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={() => removeDownload(download.id)}
+                          className="text-red-500 hover:text-red-400 transition-colors text-xs"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                     {/* Progress Bar */}
                     <div className="w-full bg-gray-700 rounded-full h-1.5 mb-2">
@@ -143,14 +152,16 @@ const DownloadsPage: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      {download.status === 'failed' && (
-                        <button 
-                          onClick={() => retryDownload(download)}
-                          className="text-blue-500 hover:text-blue-400 transition-colors"
-                        >
-                          Retry
-                        </button>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {download.status === 'failed' && (
+                          <button 
+                            onClick={() => retryDownload(download)}
+                            className="text-blue-500 hover:text-blue-400 transition-colors"
+                          >
+                            Retry
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -191,6 +202,7 @@ const DownloadsPage: React.FC = () => {
                           </p>
                         </div>
                       </div>
+                      {/* Remove button removed as history cannot be deleted */}
                     </div>
                   </div>
                 );

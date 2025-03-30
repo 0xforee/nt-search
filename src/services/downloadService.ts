@@ -97,3 +97,16 @@ export async function getDownloadHistory(page: number = 1): Promise<DownloadHist
     body: { page }
   });
 }
+
+/**
+ * Removes a download from history
+ * @param downloadId The ID of the download to remove
+ * @returns Promise with removal result
+ */
+export async function removeDownload(downloadId: string): Promise<any> {
+  return apiRequest('/download/remove', {
+    method: 'POST',
+    urlEncoded: true,
+    body: { id: downloadId }
+  });
+}

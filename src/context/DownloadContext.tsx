@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads, getDownloadHistory } from '../services/downloadService';
+import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads, getDownloadHistory, removeDownload as removeDownloadService } from '../services/downloadService';
 import { Download } from '../types';
 
 interface DownloadContextType {
@@ -9,6 +9,7 @@ interface DownloadContextType {
   addDownload: (download: Omit<Download, 'id' | 'startedAt'>) => Promise<string>;
   cancelDownload: (downloadId: string) => Promise<void>;
   retryDownload: (download: Download) => Promise<void>;
+  removeDownload: (downloadId: string) => Promise<void>;
   updateDownloadProgress: (downloadId: string, progress: number, speed: number) => void;
   completeDownload: (downloadId: string) => void;
   failDownload: (downloadId: string, error: string) => void;
@@ -317,6 +318,32 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [addDownload]);
 
+  // Function to remove a download (only works for active downloads)
+  const removeDownload = useCallback(async (downloadId: string) => {
+    try {
+      // Check if the download exists in active downloads
+      const isActiveDownload = activeDownloads.some(download => download.id === downloadId);
+      
+      if (!isActiveDownload) {
+        console.warn('Cannot remove download that is not active:', downloadId);
+        return;
+      }
+      
+      // Call API to remove the download
+      const response = await removeDownloadService(downloadId);
+      
+      if (response && response.success) {
+        // Remove from active downloads
+        setActiveDownloads(prev => prev.filter(item => item.id !== downloadId));
+        
+        // Refresh the active downloads to ensure UI is up to date
+        fetchActiveDownloads();
+      }
+    } catch (error) {
+      console.error('Error removing download:', error);
+    }
+  }, [activeDownloads, fetchActiveDownloads]);
+
   return (
     <DownloadContext.Provider
       value={{
@@ -326,6 +353,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         addDownload,
         cancelDownload,
         retryDownload,
+        removeDownload,
         updateDownloadProgress,
         completeDownload,
         failDownload,
