@@ -110,3 +110,29 @@ export async function removeDownload(downloadId: string): Promise<any> {
     body: { id: downloadId }
   });
 }
+
+/**
+ * Starts a paused download
+ * @param downloadId The ID of the download to start
+ * @returns Promise with start result
+ */
+export async function startDownload(downloadId: string): Promise<any> {
+  return apiRequest('/download/start', {
+    method: 'POST',
+    urlEncoded: true,
+    body: { id: downloadId }
+  });
+}
+
+/**
+ * Pauses an active download
+ * @param downloadId The ID of the download to pause
+ * @returns Promise with pause result
+ */
+export async function stopDownload(downloadId: string): Promise<any> {
+  return apiRequest('/download/stop', {
+    method: 'POST',
+    urlEncoded: true,
+    body: { id: downloadId }
+  });
+}

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads, getDownloadHistory, removeDownload as removeDownloadService } from '../services/downloadService';
+import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads, getDownloadHistory, removeDownload as removeDownloadService, startDownload as startDownloadService, stopDownload as stopDownloadService } from '../services/downloadService';
 import { Download } from '../types';
 
 interface DownloadContextType {
@@ -14,6 +14,8 @@ interface DownloadContextType {
   completeDownload: (downloadId: string) => void;
   failDownload: (downloadId: string, error: string) => void;
   startDownload: (resourceId: string, movieId: string) => Promise<string>;
+  startPausedDownload: (downloadId: string) => Promise<void>;
+  pauseActiveDownload: (downloadId: string) => Promise<void>;
   fetchActiveDownloads: () => Promise<void>;
   fetchDownloadHistory: (page?: number) => Promise<void>;
   currentHistoryPage: number;
@@ -344,6 +346,104 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [activeDownloads, fetchActiveDownloads]);
 
+  // Function to start a paused download
+  const startPausedDownload = useCallback(async (downloadId: string) => {
+    try {
+      // Check if the download exists in active downloads
+      const download = activeDownloads.find(download => download.id === downloadId);
+      
+      if (!download) {
+        console.warn('Cannot start download that is not active:', downloadId);
+        return;
+      }
+      
+      // Update UI immediately to show starting status
+      setActiveDownloads(prev =>
+        prev.map(item =>
+          item.id === downloadId
+            ? { ...item, status: 'downloading', state: 'Downloading' }
+            : item
+        )
+      );
+      
+      // Call API to start the download
+      const response = await startDownloadService(downloadId);
+      
+      if (response && response.success) {
+        // Refresh the active downloads to ensure UI is up to date
+        fetchActiveDownloads();
+      } else {
+        // If API call failed, revert the status
+        setActiveDownloads(prev =>
+          prev.map(item =>
+            item.id === downloadId
+              ? { ...item, status: 'paused', state: 'Stoped' }
+              : item
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error starting download:', error);
+      // Revert UI state on error
+      setActiveDownloads(prev =>
+        prev.map(item =>
+          item.id === downloadId
+            ? { ...item, status: 'paused', state: 'Stoped' }
+            : item
+        )
+      );
+    }
+  }, [activeDownloads, fetchActiveDownloads]);
+
+  // Function to pause an active download
+  const pauseActiveDownload = useCallback(async (downloadId: string) => {
+    try {
+      // Check if the download exists in active downloads
+      const download = activeDownloads.find(download => download.id === downloadId);
+      
+      if (!download) {
+        console.warn('Cannot pause download that is not active:', downloadId);
+        return;
+      }
+      
+      // Update UI immediately to show pausing status
+      setActiveDownloads(prev =>
+        prev.map(item =>
+          item.id === downloadId
+            ? { ...item, status: 'paused', state: 'Stoped' }
+            : item
+        )
+      );
+      
+      // Call API to pause the download
+      const response = await stopDownloadService(downloadId);
+      
+      if (response && response.success) {
+        // Refresh the active downloads to ensure UI is up to date
+        fetchActiveDownloads();
+      } else {
+        // If API call failed, revert the status
+        setActiveDownloads(prev =>
+          prev.map(item =>
+            item.id === downloadId
+              ? { ...item, status: 'downloading', state: 'Downloading' }
+              : item
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error pausing download:', error);
+      // Revert UI state on error
+      setActiveDownloads(prev =>
+        prev.map(item =>
+          item.id === downloadId
+            ? { ...item, status: 'downloading', state: 'Downloading' }
+            : item
+        )
+      );
+    }
+  }, [activeDownloads, fetchActiveDownloads]);
+
   return (
     <DownloadContext.Provider
       value={{
@@ -358,6 +458,8 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         completeDownload,
         failDownload,
         startDownload,
+        startPausedDownload,
+        pauseActiveDownload,
         fetchActiveDownloads,
         fetchDownloadHistory,
         currentHistoryPage,

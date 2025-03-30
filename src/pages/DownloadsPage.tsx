@@ -17,7 +17,9 @@ const DownloadsPage: React.FC = () => {
     fetchActiveDownloads,
     fetchDownloadHistory,
     currentHistoryPage,
-    totalHistoryPages
+    totalHistoryPages,
+    startPausedDownload,
+    pauseActiveDownload
   } = useDownload();
   
   const [historyPage, setHistoryPage] = useState(1);
@@ -90,9 +92,33 @@ const DownloadsPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        {/* Play/Pause Button */}
+                        {download.status === 'paused' || download.state === 'Stoped' ? (
+                          <button 
+                            onClick={() => startPausedDownload(download.id)}
+                            className="text-green-500 hover:text-green-400 transition-colors"
+                            title="Start Download"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => pauseActiveDownload(download.id)}
+                            className="text-yellow-500 hover:text-yellow-400 transition-colors"
+                            title="Pause Download"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </button>
+                        )}
                         <button 
                           onClick={() => cancelDownload(download.id)}
                           className="text-gray-400 hover:text-white transition-colors"
+                          title="Cancel Download"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -101,6 +127,7 @@ const DownloadsPage: React.FC = () => {
                         <button 
                           onClick={() => removeDownload(download.id)}
                           className="text-red-500 hover:text-red-400 transition-colors text-xs"
+                          title="Remove Download"
                         >
                           Remove
                         </button>
