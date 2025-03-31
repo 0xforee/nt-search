@@ -102,7 +102,7 @@ const SearchResultsPage: React.FC = () => {
   }
 
   return (
-    <MainLayout>
+    <MainLayout title={`Search Results for "${query}"`}>
       <div className="container mx-auto px-4 py-8">
         {results.length === 0 ? (
           <div className="text-center text-gray-400">

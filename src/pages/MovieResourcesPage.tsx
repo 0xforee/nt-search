@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDownload } from '../context/DownloadContext';
+import MainLayout from '../layouts/MainLayout';
 
 interface TorrentResource {
   id: number;

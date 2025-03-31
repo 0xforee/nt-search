@@ -98,7 +98,7 @@ const MovieDetailsPage: React.FC = () => {
   }
 
   return (
-    <MainLayout>
+    <MainLayout title={movie.title}>
       <div className="relative">
         {/* Background Image with Gradient Overlay */}
         <div 
