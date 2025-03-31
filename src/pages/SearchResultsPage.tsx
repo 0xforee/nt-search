@@ -104,35 +104,37 @@ const SearchResultsPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-white mb-6">
-          Search Results for "{query}"
-        </h1>
-
         {results.length === 0 ? (
           <div className="text-center text-gray-400">
             No results found for "{query}"
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4">
             {results.map((result) => (
               <div 
                 key={result.id}
                 onClick={() => handleMovieClick(result.id, result.type)}
-                className="bg-gray-800 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200 cursor-pointer"
+                className="bg-gray-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200 cursor-pointer shadow-lg"
               >
-                <img 
-                  src={result.poster} 
-                  alt={result.title}
-                  className="w-full aspect-[2/3] object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="text-white font-medium truncate">{result.title}</h3>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-gray-400 text-sm">{result.year || 'N/A'}</span>
-                    <span className="text-yellow-500 text-sm">★ {result.vote}</span>
+                <div className="relative">
+                  <img 
+                    src={result.poster || '/placeholder-movie.svg'} 
+                    alt={result.title}
+                    className="w-full aspect-[2/3] object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder-movie.svg';
+                    }}
+                  />
+                </div>
+                <div className="p-3 bg-gray-800 border-t border-gray-700">
+                  <h3 className="text-white text-sm font-medium truncate">{result.title}</h3>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-gray-400 text-xs">{result.year || 'N/A'}</span>
+                    <span className="text-yellow-500 text-xs">★ {result.vote}</span>
                   </div>
-                  <div className="mt-2">
-                    <span className="text-gray-400 text-sm">{result.category}</span>
+                  <div className="mt-1">
+                    <span className="text-gray-400 text-xs">{result.category}</span>
                   </div>
                 </div>
               </div>
@@ -144,4 +146,4 @@ const SearchResultsPage: React.FC = () => {
   );
 };
 
-export default SearchResultsPage; 
+export default SearchResultsPage;
