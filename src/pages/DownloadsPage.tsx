@@ -29,12 +29,8 @@ const DownloadsPage: React.FC = () => {
     fetchActiveDownloads();
     fetchDownloadHistory(historyPage);
     
-    // Set up polling for active downloads
-    const interval = setInterval(() => {
-      fetchActiveDownloads();
-    }, 10000); // Refresh every 10 seconds
-    
-    return () => clearInterval(interval);
+    // Removed automatic polling of 'download/now' endpoint
+    // Downloads will update only when user-initiated actions occur
   }, [fetchActiveDownloads, fetchDownloadHistory, historyPage]);
 
   const formatFileSize = (bytes: number): string => {

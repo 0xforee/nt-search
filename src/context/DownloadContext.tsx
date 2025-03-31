@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads, getDownloadHistory, removeDownload as removeDownloadService, startDownload as startDownloadService, stopDownload as stopDownloadService } from '../services/downloadService';
+import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads, getDownloadHistory, removeDownload as removeDownloadService, startDownload as startDownloadService, stopDownload as stopDownloadService, getDownloadInfo as getDownloadInfoService } from '../services/downloadService';
 import { Download } from '../types';
 
 interface DownloadContextType {
@@ -18,6 +18,7 @@ interface DownloadContextType {
   pauseActiveDownload: (downloadId: string) => Promise<void>;
   fetchActiveDownloads: () => Promise<void>;
   fetchDownloadHistory: (page?: number) => Promise<void>;
+  getDownloadInfo: (downloadId: string) => Promise<any>;
   currentHistoryPage: number;
   totalHistoryPages: number;
 }
@@ -252,18 +253,30 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error fetching download history:', error);
     }
   }, []);
+  
+  // Function to get detailed information about a specific download task
+  const getDownloadInfo = useCallback(async (downloadId: string) => {
+    try {
+      // Call the service function
+      const response = await getDownloadInfoService(downloadId);
+      
+      if (response && response.success) {
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching download info for ${downloadId}:`, error);
+      return null;
+    }
+  }, []);
 
   // Fetch active downloads and history when component mounts
   useEffect(() => {
     fetchActiveDownloads();
     fetchDownloadHistory();
     
-    // Set up periodic refresh of active downloads
-    const refreshInterval = setInterval(() => {
-      fetchActiveDownloads();
-    }, 30000); // Refresh every 30 seconds
-    
-    return () => clearInterval(refreshInterval);
+    // Removed automatic polling of 'download/now' endpoint
+    // Downloads will update only when user-initiated actions occur
   }, [fetchActiveDownloads, fetchDownloadHistory]);
 
   const completeDownload = useCallback((downloadId: string) => {
@@ -462,6 +475,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         pauseActiveDownload,
         fetchActiveDownloads,
         fetchDownloadHistory,
+        getDownloadInfo,
         currentHistoryPage,
         totalHistoryPages
       }}
