@@ -99,22 +99,11 @@ const MovieDetailsPage: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <button 
-          onClick={() => navigate(-1)}
-          className="mb-6 text-white hover:text-blue-400 transition-colors flex items-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-          </svg>
-          Back to Search
-        </button>
-
+      <div className="container mx-auto px-8 pb-8">
         {/* Movie Header */}
-        <div className="flex flex-col md:flex-row gap-8 mb-8">
+        <div className="flex flex-col md:flex-row items-start gap-4 mb-8">
           {/* Poster */}
-          <div className="w-full md:w-1/3 lg:w-1/4">
+          <div className="w-64 flex-shrink-0">
             <img 
               src={movie.image} 
               alt={movie.title}
@@ -123,17 +112,19 @@ const MovieDetailsPage: React.FC = () => {
           </div>
 
           {/* Info */}
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white mb-4">{movie.title}</h1>
-            <div className="flex items-center space-x-4 mb-4">
-              <span className="text-gray-400">{movie.year}</span>
-              <span className="text-yellow-500">★ {movie.vote}</span>
-              <span className="text-gray-400">{movie.genres}</span>
+          <div className="flex-1 md:pt-0">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-white mb-2">{movie.title}</h1>
+              <div className="flex items-center space-x-4 mb-3">
+                <span className="text-gray-400">{movie.year}</span>
+                <span className="text-yellow-500">★ {movie.vote}</span>
+                <span className="text-gray-400">{movie.genres}</span>
+              </div>
             </div>
-            <p className="text-gray-300 mb-6">{movie.overview}</p>
+            <p className="text-gray-300 mb-4">{movie.overview}</p>
             
             {/* Additional Info */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
               {movie.fact.map((fact, index) => (
                 <div key={index}>
                   <h3 className="text-gray-400 text-sm">{Object.keys(fact)[0]}</h3>
@@ -143,7 +134,7 @@ const MovieDetailsPage: React.FC = () => {
             </div>
 
             {/* Download Button */}
-            <div className="mt-8">
+            <div className="mt-4">
               <button 
                 onClick={() => navigate(`/movie/${id}/resources?type=${searchParams.get('type') || 'MOV'}`)}
                 className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center"
@@ -160,17 +151,19 @@ const MovieDetailsPage: React.FC = () => {
         {/* Cast Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">Cast</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="flex overflow-x-auto space-x-4 pb-4">
             {movie.actors.slice(0, 10).map((actor) => (
-              <div key={actor.id} className="bg-gray-800 rounded-lg overflow-hidden">
-                <img 
-                  src={actor.image} 
-                  alt={actor.name}
-                  className="w-full aspect-[2/3] object-cover"
-                />
-                <div className="p-3">
-                  <h3 className="text-white font-medium truncate">{actor.name}</h3>
-                  <p className="text-gray-400 text-sm truncate">{actor.role}</p>
+              <div key={actor.id} className="flex-none text-center w-24">
+                <div className="w-20 h-20 mx-auto relative mb-2">
+                  <img 
+                    src={actor.image} 
+                    alt={actor.name}
+                    className="w-full h-full object-cover rounded-full border-2 border-gray-700"
+                  />
+                </div>
+                <div className="w-full">
+                  <h3 className="text-white text-sm font-medium truncate">{actor.name}</h3>
+                  <p className="text-gray-400 text-xs truncate">{actor.role}</p>
                 </div>
               </div>
             ))}
@@ -212,4 +205,4 @@ const MovieDetailsPage: React.FC = () => {
   );
 };
 
-export default MovieDetailsPage; 
+export default MovieDetailsPage;

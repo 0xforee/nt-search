@@ -32,7 +32,7 @@ const AppRoutes: React.FC = () => {
               path="/search"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
+                  <MainLayout title="Search Results">
                     <SearchResultsPage />
                   </MainLayout>
                 </ProtectedRoute>
@@ -42,7 +42,7 @@ const AppRoutes: React.FC = () => {
               path="/movie/:id"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
+                  <MainLayout title="Movie Details">
                     <MovieDetailsPage />
                   </MainLayout>
                 </ProtectedRoute>
@@ -52,7 +52,9 @@ const AppRoutes: React.FC = () => {
               path="/movie/:id/resources"
               element={
                 <ProtectedRoute>
-                  <MovieResourcesPage />
+                  <MainLayout title="Movie Resources">
+                    <MovieResourcesPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />
@@ -60,7 +62,9 @@ const AppRoutes: React.FC = () => {
               path="/downloads"
               element={
                 <ProtectedRoute>
-                  <DownloadsPage />
+                  <MainLayout title="Downloads">
+                    <DownloadsPage />
+                  </MainLayout>
                 </ProtectedRoute>
               }
             />

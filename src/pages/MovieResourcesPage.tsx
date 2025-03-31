@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
 import { useDownload } from '../context/DownloadContext';
 
 interface TorrentResource {

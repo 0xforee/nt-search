@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
 import { useDownload } from '../context/DownloadContext';
 import { Download } from '../types';
 
@@ -41,7 +40,6 @@ const DownloadsPage: React.FC = () => {
   };
 
   return (
-    <MainLayout>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -271,7 +269,6 @@ const DownloadsPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </MainLayout>
   );
 };
 
