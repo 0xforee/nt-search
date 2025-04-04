@@ -46,10 +46,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const token = localStorage.getItem('auth_token');
         if (token) {
-          // TODO: Validate token with backend
-          // For now, we'll just simulate a delay
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          // setUser(userData);
+          // do nothing
+          const userData = localStorage.getItem('user');
+          if (userData) {
+            setUser(JSON.parse(userData));
+          }
         }
       } catch (err) {
         setError('Failed to restore authentication state');
@@ -92,6 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
     } catch (err) {
       setError('Login failed. Please check your credentials.');
       throw err;

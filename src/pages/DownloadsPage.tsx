@@ -87,7 +87,7 @@ const DownloadsPage: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         {/* Play/Pause Button */}
-                        {download.status === 'paused' || download.state === 'Stoped' ? (
+                        {state === 'paused' || state === 'Stoped' ? (
                           <button 
                             onClick={() => startPausedDownload(download.id)}
                             className="text-green-500 hover:text-green-400 transition-colors"

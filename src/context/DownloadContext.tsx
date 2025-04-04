@@ -154,31 +154,6 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
   
-  // Function to poll for download progress updates from the server
-  const pollDownloadProgress = useCallback(async (downloadId: string) => {
-    try {
-      const response = await getDownloadInfoService(downloadId);
-      
-      if (response && response.success) {
-        const { progress, speed, status } = response.data;
-        
-        if (status === 'completed') {
-          completeDownload(downloadId);
-        } else if (status === 'failed') {
-          failDownload(downloadId, response.data.error || 'Download failed');
-        } else {
-          updateDownloadProgress(downloadId, progress, speed);
-        }
-        
-        return status;
-      }
-    } catch (error) {
-      console.error(`Error polling download progress for ${downloadId}:`, error);
-    }
-    
-    return null;
-  }, []);
-  
   // Function to fetch all active downloads from the server
   const fetchActiveDownloads = useCallback(async () => {
     try {
