@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useDownload } from '../context/DownloadContext';
-import { Download } from '../types';
 
 const DownloadsPage: React.FC = () => {
-  const navigate = useNavigate();
   const { 
     activeDownloads, 
     downloadHistory, 
     apiDownloadHistory,
     retryDownload,
     removeDownload,
-    updateDownloadProgress,
     fetchActiveDownloads,
     fetchDownloadHistory,
-    currentHistoryPage,
     totalHistoryPages,
     startPausedDownload,
     pauseActiveDownload
@@ -34,13 +29,6 @@ const DownloadsPage: React.FC = () => {
     // Removed automatic polling of 'download/now' endpoint
     // Downloads will update only when user-initiated actions occur
   }, []);
-
-  const formatFileSize = (bytes: number): string => {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    if (bytes === 0) return '0 Byte';
-    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString());
-    return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
-  };
 
   return (
       <div className="container mx-auto px-4 py-8">

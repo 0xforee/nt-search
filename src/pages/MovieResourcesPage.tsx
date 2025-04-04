@@ -38,7 +38,6 @@ const MovieResourcesPage: React.FC = () => {
   const [resources, setResources] = useState<TorrentResource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [movieTitle, setMovieTitle] = useState<string>('');
 
   useEffect(() => {
     const fetchMovieResources = async () => {
@@ -47,7 +46,6 @@ const MovieResourcesPage: React.FC = () => {
       // Check if we already have the movie data in context
       if (movieResources[id]) {
         setMovie(movieResources[id]);
-        setMovieTitle(movieResources[id].title);
         const torrents = extractTorrents(movieResources[id].torrent_dict);
         setResources(torrents);
         setIsLoading(false);
@@ -64,9 +62,6 @@ const MovieResourcesPage: React.FC = () => {
         if(!passedMovie && !id) {
           throw new Error('Movie ID is required');
         }
-
-        // Use the movie data passed from the previous page
-        setMovieTitle(passedMovie.title);
         
         // Now use the title to search for resources
         const searchParams = {
@@ -132,7 +127,7 @@ const MovieResourcesPage: React.FC = () => {
       // Format: [['MOV', {...}]]
       torrentDict.forEach((item: any) => {
         if (Array.isArray(item) && item.length > 1) {
-          const [mediaType, resolutions] = item;
+          const [resolutions] = item;
           
           // Iterate through each resolution type (1080p_bluray, 2160p_, etc.)
           Object.values(resolutions).forEach((resolution: any) => {

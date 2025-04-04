@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { SearchItem, SearchResponse } from '../types';
+import { SearchResponse } from '../types';
 import { apiRequest } from '../services/api';
 import { useSearch } from '../context/SearchContext';
 

@@ -1,5 +1,4 @@
 import { apiRequest } from './api';
-import { Download } from '../types';
 
 interface DownloadHistoryItem {
   id: string;

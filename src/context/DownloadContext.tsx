@@ -187,7 +187,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         // Update each download with its info
         downloadInfos.forEach(info => {
-          const { id, progress, speed, state } = info;
+          const { id, progress, speed} = info;
           updateDownloadProgress(id, progress, speed);
         })
       }
