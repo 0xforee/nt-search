@@ -227,15 +227,38 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (activeDownloads.length === 0) return;
     
     const pollingInterval = setInterval(() => {
-      activeDownloads.forEach(download => {
-        if (download.status === 'downloading') {
-          pollDownloadProgress(download.id);
-        }
-      });
+      // Get all activeDownloads tasks
+      if (activeDownloads.length > 0) {
+        // Create a batch request with all download IDs separated by '|'
+        const downloadIds = activeDownloads.map(download => download.id).join('|');
+        
+        // Make a single API call for all active downloads
+        getDownloadInfoService(downloadIds).then(response => {
+          if (response && response.success && response.data) {
+            // Handle batch response - could be a single object or an array depending on API
+            const downloadInfos = Array.isArray(response.data) ? response.data : [response.data];
+            
+            // Update each download with its info
+            downloadInfos.forEach(info => {
+              const { id, progress, speed, status } = info;
+              
+              if (status === 'completed') {
+                completeDownload(id);
+              } else if (status === 'failed') {
+                failDownload(id, info.error || 'Download failed');
+              } else {
+                updateDownloadProgress(id, progress, speed);
+              }
+            });
+          }
+        }).catch(error => {
+          console.error('Error polling download progress:', error);
+        });
+      }
     }, 3000); // Poll every 3 seconds
     
     return () => clearInterval(pollingInterval);
-  }, [activeDownloads, pollDownloadProgress]);
+  }, [activeDownloads, updateDownloadProgress]);
   
   // Function to fetch download history from the API
   const fetchDownloadHistory = useCallback(async (page: number = 1) => {

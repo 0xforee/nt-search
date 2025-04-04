@@ -116,14 +116,15 @@ export async function stopDownload(downloadId: string): Promise<any> {
 }
 
 /**
- * Gets detailed information about a specific download task
- * @param downloadId The ID of the download to get information for
- * @returns Promise with detailed download information
+ * Gets detailed information about a specific download task or multiple tasks
+ * @param downloadId The ID of the download to get information for, or multiple IDs separated by '|'
+ * @returns Promise with detailed download information. When multiple IDs are provided,
+ * the response will contain an array of download information objects.
  */
 export async function getDownloadInfo(downloadId: string): Promise<any> {
   return apiRequest('/download/info', {
     method: 'POST',
     urlEncoded: true,
-    body: { id: downloadId }
+    body: { ids: downloadId }
   });
 }
