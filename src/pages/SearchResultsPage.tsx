@@ -3,12 +3,13 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import { SearchItem, SearchResponse } from '../types';
 import { apiRequest } from '../services/api';
+import { useSearch } from '../context/SearchContext';
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const query = searchParams.get('q') || '';
-  const [results, setResults] = useState<SearchItem[]>([]);
+  const { searchResults, setSearchResults } = useSearch();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,7 +39,7 @@ const SearchResultsPage: React.FC = () => {
           throw new Error(data.message || 'Search failed');
         }
 
-        setResults(data.data.Items);
+        setSearchResults(data.data.Items);
       } catch (err) {
         setError('Failed to fetch search results. Please try again.');
         console.error('Search error:', err);
@@ -92,13 +93,13 @@ const SearchResultsPage: React.FC = () => {
   return (
     <MainLayout title={`Search Results for "${query}"`}>
       <div className="container mx-auto px-4 py-8">
-        {results.length === 0 ? (
+        {searchResults.length === 0 ? (
           <div className="text-center text-gray-400">
             No results found for "{query}"
           </div>
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4">
-            {results.map((result) => (
+            {searchResults.map((result) => (
               <div 
                 key={result.id}
                 onClick={() => handleMovieClick(result.id, result.media_type)}

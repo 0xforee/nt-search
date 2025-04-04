@@ -1,44 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useDownload } from '../context/DownloadContext';
+import { useSearch } from '../context/SearchContext';
 import MainLayout from '../layouts/MainLayout';
 import { apiRequest } from '../services/api';
-
-interface TorrentResource {
-  id: number;
-  seeders: number;
-  enclosure: string;
-  site: string;
-  torrent_name: string;
-  description: string;
-  pageurl: string;
-  uploadvalue: number;
-  downloadvalue: number;
-  size: string;
-  respix: string;
-  restype: string;
-  reseffect: string;
-  releasegroup: string;
-  video_encode: string;
-  labels: string[];
-}
-
-interface MovieData {
-  key: number;
-  title: string;
-  year: string;
-  type_key: string;
-  image: string;
-  type: string;
-  vote: string;
-  tmdbid: string;
-  backdrop: string;
-  poster: string;
-  overview: string;
-  fav: string;
-  rssid: string;
-  torrent_dict: TorrentResource[];
-}
+import { MovieData, TorrentResource } from '../types';
 
 interface SearchKeywordResponse {
   code: number;
@@ -68,6 +34,7 @@ const MovieResourcesPage: React.FC = () => {
   const location = useLocation();
   const { startDownload } = useDownload();
   const [movie, setMovie] = useState<MovieData | null>(null);
+  const {movieResources, setMovieResources } = useSearch();
   const [resources, setResources] = useState<TorrentResource[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,6 +43,16 @@ const MovieResourcesPage: React.FC = () => {
   useEffect(() => {
     const fetchMovieResources = async () => {
       if (!id) return;
+
+      // Check if we already have the movie data in context
+      if (movieResources[id]) {
+        setMovie(movieResources[id]);
+        setMovieTitle(movieResources[id].title);
+        const torrents = extractTorrents(movieResources[id].torrent_dict);
+        setResources(torrents);
+        setIsLoading(false);
+        return;
+      }
 
       setIsLoading(true);
       setError(null);
@@ -126,60 +103,13 @@ const MovieResourcesPage: React.FC = () => {
         if (movieKeys.length > 0) {
           const firstMovieKey = movieKeys[0];
           const movieData = results[firstMovieKey];
+          setMovieResources(id, movieData);
           setMovie(movieData);
 
           // Extract torrent resources
-          if (movieData.torrent_dict) {
-            // Handle nested structure as shown in the sample response
-            const torrents: TorrentResource[] = [];
-            
-            // Process the nested torrent_dict structure
-            if (Array.isArray(movieData.torrent_dict)) {
-              // Format: [['MOV', {...}]]
-              movieData.torrent_dict.forEach((item: any) => {
-                if (Array.isArray(item) && item.length > 1) {
-                  const [mediaType, resolutions] = item;
-                  
-                  // Iterate through each resolution type (1080p_bluray, 2160p_, etc.)
-                  Object.values(resolutions).forEach((resolution: any) => {
-                    // Check if group_torrents exists
-                    if (resolution.group_torrents) {
-                      // Iterate through each group in group_torrents
-                      Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
-                        // Extract torrents from torrent_list
-                        if (torrentGroup.torrent_list && Array.isArray(torrentGroup.torrent_list)) {
-                          torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
-                            torrents.push(torrent);
-                          });
-                        }
-                      });
-                    }
-                  });
-                }
-              });
-            } else {
-              // Alternative structure handling
-              Object.entries(movieData.torrent_dict).forEach(([_, typeData]: [string, any]) => {
-                if (Array.isArray(typeData)) {
-                  typeData.forEach((item: any) => {
-                    if (Array.isArray(item) && item.length > 1) {
-                      const [_, resolutions] = item;
-                      
-                      Object.values(resolutions).forEach((resolution: any) => {
-                        Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
-                          torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
-                            torrents.push(torrent);
-                          });
-                        });
-                      });
-                    }
-                  });
-                }
-              });
-            }
-            
-            setResources(torrents);
-          }
+          const torrents = extractTorrents(movieData.torrent_dict);
+          setResources(torrents);
+          
         } else {
           setError('No resources found for this movie');
         }
@@ -194,6 +124,56 @@ const MovieResourcesPage: React.FC = () => {
 
     fetchMovieResources();
   }, [id, searchParams, location.state]);
+
+  const extractTorrents = (torrentDict: any): TorrentResource[] => {
+    const torrents: TorrentResource[] = [];
+    
+    if (Array.isArray(torrentDict)) {
+      // Format: [['MOV', {...}]]
+      torrentDict.forEach((item: any) => {
+        if (Array.isArray(item) && item.length > 1) {
+          const [mediaType, resolutions] = item;
+          
+          // Iterate through each resolution type (1080p_bluray, 2160p_, etc.)
+          Object.values(resolutions).forEach((resolution: any) => {
+            // Check if group_torrents exists
+            if (resolution.group_torrents) {
+              // Iterate through each group in group_torrents
+              Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
+                // Extract torrents from torrent_list
+                if (torrentGroup.torrent_list && Array.isArray(torrentGroup.torrent_list)) {
+                  torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
+                    torrents.push(torrent);
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    } else {
+      // Alternative structure handling
+      Object.entries(torrentDict).forEach(([_, typeData]: [string, any]) => {
+        if (Array.isArray(typeData)) {
+          typeData.forEach((item: any) => {
+            if (Array.isArray(item) && item.length > 1) {
+              const [_, resolutions] = item;
+              
+              Object.values(resolutions).forEach((resolution: any) => {
+                Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
+                  torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
+                    torrents.push(torrent);
+                  });
+                });
+              });
+            }
+          });
+        }
+      });
+    }
+  
+    return torrents;
+  };
 
   const handleDownload = async (resource: TorrentResource) => {
     try {

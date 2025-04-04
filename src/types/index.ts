@@ -31,6 +31,42 @@ export interface Movie {
   type: 'movie' | 'tv';
 }
 
+export interface TorrentResource {
+  id: number;
+  seeders: number;
+  enclosure: string;
+  site: string;
+  torrent_name: string;
+  description: string;
+  pageurl: string;
+  uploadvalue: number;
+  downloadvalue: number;
+  size: string;
+  respix: string;
+  restype: string;
+  reseffect: string;
+  releasegroup: string;
+  video_encode: string;
+  labels: string[];
+}
+
+export interface MovieData {
+  key: number;
+  title: string;
+  year: string;
+  type_key: string;
+  image: string;
+  type: string;
+  vote: string;
+  tmdbid: string;
+  backdrop: string;
+  poster: string;
+  overview: string;
+  fav: string;
+  rssid: string;
+  torrent_dict: TorrentResource[];
+}
+
 export interface Genre {
   id: number;
   name: string;
