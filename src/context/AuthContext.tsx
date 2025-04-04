@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, LoginCredentials } from '../types';
+import { apiRequest } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -65,24 +66,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       setError(null);
       
-      const formData = new URLSearchParams();
-      formData.append('username', credentials.username);
-      formData.append('password', credentials.password);
-
-      const response = await fetch('http://localhost:3000/api/v1/user/login', {
+      // Use apiRequest instead of direct fetch
+      const data: LoginResponse = await apiRequest('/user/login', {
         method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData.toString(),
+        body: credentials,
+        urlEncoded: true
       });
-
-      if (!response.ok) {
-        throw new Error('Login request failed');
-      }
-
-      const data: LoginResponse = await response.json();
       
       if (!data.success) {
         throw new Error('Login failed');
@@ -141,4 +130,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}; 
+};
