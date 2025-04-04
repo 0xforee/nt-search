@@ -9,7 +9,6 @@ const DownloadsPage: React.FC = () => {
     activeDownloads, 
     downloadHistory, 
     apiDownloadHistory,
-    cancelDownload, 
     retryDownload,
     removeDownload,
     updateDownloadProgress,
@@ -41,19 +40,6 @@ const DownloadsPage: React.FC = () => {
 
   return (
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Downloads</h1>
-          <button 
-            onClick={() => navigate(-1)}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
         {/* Active Downloads */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-white mb-4">Active Downloads</h2>
@@ -110,20 +96,13 @@ const DownloadsPage: React.FC = () => {
                           </button>
                         )}
                         <button 
-                          onClick={() => cancelDownload(download.id)}
+                          onClick={() => removeDownload(download.id)}
                           className="text-gray-400 hover:text-white transition-colors"
-                          title="Cancel Download"
+                          title="Remove Download"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
-                        </button>
-                        <button 
-                          onClick={() => removeDownload(download.id)}
-                          className="text-red-500 hover:text-red-400 transition-colors text-xs"
-                          title="Remove Download"
-                        >
-                          Remove
                         </button>
                       </div>
                     </div>

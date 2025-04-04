@@ -7,7 +7,6 @@ interface DownloadContextType {
   downloadHistory: Download[];
   apiDownloadHistory: any[];
   addDownload: (download: Omit<Download, 'id' | 'startedAt'>) => Promise<string>;
-  cancelDownload: (downloadId: string) => Promise<void>;
   retryDownload: (download: Download) => Promise<void>;
   removeDownload: (downloadId: string) => Promise<void>;
   updateDownloadProgress: (downloadId: string, progress: number, speed: number) => void;
@@ -85,29 +84,6 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch (error) {
       console.error('Error initiating download:', error);
       throw error;
-    }
-  }, []);
-
-  const cancelDownload = useCallback(async (downloadId: string) => {
-    try {
-      // First update UI to show cancellation is in progress
-      setActiveDownloads(prev =>
-        prev.map(download =>
-          download.id === downloadId
-            ? { ...download, status: 'paused' }
-            : download
-        )
-      );
-      
-      // Call API to stop the download
-      await stopDownloadService(downloadId);
-      
-      // Remove from active downloads
-      setActiveDownloads(prev => prev.filter(d => d.id !== downloadId));
-    } catch (error) {
-      console.error('Error canceling download:', error);
-      // If cancellation fails, keep the download but mark as failed
-      failDownload(downloadId, 'Failed to cancel download');
     }
   }, []);
 
@@ -462,7 +438,6 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         downloadHistory,
         apiDownloadHistory,
         addDownload,
-        cancelDownload,
         retryDownload,
         removeDownload,
         updateDownloadProgress,
