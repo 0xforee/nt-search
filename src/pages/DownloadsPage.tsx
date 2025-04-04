@@ -57,7 +57,6 @@ const DownloadsPage: React.FC = () => {
                 // Extract title and image from the download object if available
                 const title = (download as any).title || 'Movie Title';
                 const image = (download as any).image || '';
-                const name = (download as any).name || '';
                 const state = (download as any).state || download.status;
                 const speedText = typeof download.speed === 'string' ? download.speed : `${download.speed} MB/s`;
                 
@@ -72,7 +71,6 @@ const DownloadsPage: React.FC = () => {
                         )}
                         <div>
                           <h3 className="text-white text-sm">{title}</h3>
-                          <p className="text-gray-400 text-xs">{name}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
