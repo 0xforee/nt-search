@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { MovieDetails } from '../types';
+import { MovieDetails, MovieDetailsResponse } from '../types';
+import { apiRequest } from '../services/api';
 
 const MovieDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,33 +20,20 @@ const MovieDetailsPage: React.FC = () => {
       setError(null);
 
       try {
-        const token = localStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('Authentication token not found');
-        }
-
         const mediaType = searchParams.get('type') || 'MOV';
 
-        // Fetch the detailed information with the type from URL
-        const formData = new URLSearchParams();
-        formData.append('type', mediaType);
-        formData.append('tmdbid', id);
+        // Prepare request parameters
+        const requestParams = {
+          type: mediaType,
+          tmdbid: id
+        };
 
-        const response = await fetch('http://localhost:3000/api/v1/media/detail', {
+        // Use apiRequest instead of direct fetch
+        const data = await apiRequest<MovieDetailsResponse>('/media/detail', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'accept': 'application/json',
-            'Authorization': token
-          },
-          body: formData.toString(),
+          urlEncoded: true,
+          body: requestParams
         });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch movie details');
-        }
-
-        const data = await response.json();
         
         if (!data.success) {
           throw new Error(data.message || 'Failed to fetch movie details');
