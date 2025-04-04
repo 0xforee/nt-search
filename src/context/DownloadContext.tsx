@@ -173,6 +173,29 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
+  const refreshDownloadInfo = useCallback(async () => {
+    try {
+      // Create a batch request with all download IDs separated by '|'
+      const downloadIds = activeDownloads.map(download => download.id).join('|');
+
+      // Make a single API call for all active downloads
+      const response = await getDownloadInfoService(downloadIds);
+
+      if (response && response.success && response.data) {
+        // Handle batch response - could be a single object or an array depending on API
+        const downloadInfos = Array.isArray(response.data.torrents)? response.data.torrents : [response.data.torrents];
+
+        // Update each download with its info
+        downloadInfos.forEach(info => {
+          const { id, progress, speed, state } = info;
+          updateDownloadProgress(id, progress, speed);
+        })
+      }
+    } catch (error) {
+      console.error('Error refreshing download info:', error);
+    }
+  }, [])
+
   // Set up polling for active downloads
   useEffect(() => {
     if (activeDownloads.length === 0) return;
@@ -180,24 +203,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const pollingInterval = setInterval(() => {
       // Get all activeDownloads tasks
       if (activeDownloads.length > 0) {
-        // Create a batch request with all download IDs separated by '|'
-        const downloadIds = activeDownloads.map(download => download.id).join('|');
-        
-        // Make a single API call for all active downloads
-        getDownloadInfoService(downloadIds).then(response => {
-          if (response && response.success && response.data) {
-            // Handle batch response - could be a single object or an array depending on API
-            const downloadInfos = Array.isArray(response.data.torrents) ? response.data.torrents : [response.data.torrents];
-            
-            // Update each download with its info
-            downloadInfos.forEach(info => {
-              const { id, progress, speed, state } = info;
-                updateDownloadProgress(id, progress, speed);
-            });
-          }
-        }).catch(error => {
-          console.error('Error polling download progress:', error);
-        });
+        refreshDownloadInfo();
       }
     }, 3000); // Poll every 3 seconds
     
@@ -341,7 +347,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setActiveDownloads(prev =>
         prev.map(item =>
           item.id === downloadId
-            ? { ...item, status: 'downloading', state: 'Downloading' }
+            ? { ...item, status: 'downloading', state: 'Downloading', speed: '' }
             : item
         )
       );
@@ -351,13 +357,13 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       if (response && response.success) {
         // Refresh the active downloads to ensure UI is up to date
-        fetchActiveDownloads();
+        // refreshDownloadInfo();
       } else {
         // If API call failed, revert the status
         setActiveDownloads(prev =>
           prev.map(item =>
             item.id === downloadId
-              ? { ...item, status: 'paused', state: 'Stoped' }
+              ? { ...item, status: 'paused', state: 'Stoped', speed: '' }
               : item
           )
         );
@@ -368,7 +374,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setActiveDownloads(prev =>
         prev.map(item =>
           item.id === downloadId
-            ? { ...item, status: 'paused', state: 'Stoped' }
+            ? { ...item, status: 'paused', state: 'Stoped', speed: '' }
             : item
         )
       );
@@ -390,7 +396,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setActiveDownloads(prev =>
         prev.map(item =>
           item.id === downloadId
-            ? { ...item, status: 'paused', state: 'Stoped' }
+            ? { ...item, status: 'paused', state: 'Stoped', speed: '' }
             : item
         )
       );
@@ -400,13 +406,13 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       if (response && response.success) {
         // Refresh the active downloads to ensure UI is up to date
-        fetchActiveDownloads();
+        // refreshDownloadInfo();
       } else {
         // If API call failed, revert the status
         setActiveDownloads(prev =>
           prev.map(item =>
             item.id === downloadId
-              ? { ...item, status: 'downloading', state: 'Downloading' }
+              ? { ...item, status: 'downloading', state: 'Downloading', speed: '' }
               : item
           )
         );
@@ -417,7 +423,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setActiveDownloads(prev =>
         prev.map(item =>
           item.id === downloadId
-            ? { ...item, status: 'downloading', state: 'Downloading' }
+            ? { ...item, status: 'downloading', state: 'Downloading', speed: '' }
             : item
         )
       );

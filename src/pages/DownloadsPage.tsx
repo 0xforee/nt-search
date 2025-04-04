@@ -22,6 +22,10 @@ const DownloadsPage: React.FC = () => {
   
   const [historyPage, setHistoryPage] = useState(1);
 
+  useEffect(() => {
+    
+  }, [activeDownloads])
+
   // Fetch active downloads and history when component mounts
   useEffect(() => {
     fetchActiveDownloads();
@@ -29,7 +33,7 @@ const DownloadsPage: React.FC = () => {
     
     // Removed automatic polling of 'download/now' endpoint
     // Downloads will update only when user-initiated actions occur
-  }, [fetchActiveDownloads, fetchDownloadHistory, historyPage]);
+  }, []);
 
   const formatFileSize = (bytes: number): string => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
