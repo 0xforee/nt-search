@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useDownload } from '../context/DownloadContext';
 import MainLayout from '../layouts/MainLayout';
+import { apiRequest } from '../services/api';
 
 interface TorrentResource {
   id: number;
@@ -39,88 +40,137 @@ interface MovieData {
   torrent_dict: TorrentResource[];
 }
 
-// Mock data
-const mockData: { [key: string]: MovieData } = {
-  "阿甘正传 (1994)": {
-    "key": 1,
-    "title": "阿甘正传",
-    "year": "1994",
-    "type_key": "MOV",
-    "image": "https://assets.fanart.tv/fanart/movies/13/moviethumb/forrest-gump-523a8535e69fa.jpg",
-    "type": "电影",
-    "vote": "8.5",
-    "tmdbid": "13",
-    "backdrop": "https://assets.fanart.tv/fanart/movies/13/moviethumb/forrest-gump-523a8535e69fa.jpg",
-    "poster": "https://image.tmdb.org/t/p/w500/Ace1AhTTz2PQ2OVaX5mfZ7ey7Gv.jpg",
-    "overview": "阿甘于二战结束后不久出生在美国南方阿拉巴马州一个闭塞的小镇，他先天弱智，智商只有75，然而他的妈妈是一个性格坚强的女性，她常常鼓励阿甘\"傻人有傻福\"，要他自强不息。阿甘像普通孩子一样上学，并且认识了一生的朋友和至爱珍妮，在珍妮和妈妈的爱护下，阿甘凭着上帝赐予的\"飞毛腿\"开始了一生不停的奔跑。阿甘成为橄榄球巨星、越战英雄、乒乓球外交使者、亿万富翁，但是，他始终忘不了珍妮，几次匆匆的相聚和离别，更是加深了阿甘的思念。有一天，阿甘收到珍妮的信，他们终于又要见面…",
-    "fav": "0",
-    "rssid": "",
-    "torrent_dict": [
-      {
-        "id": 4,
-        "seeders": 88,
-        "enclosure": "https://hdarea.club/download.php?id=16745",
-        "site": "HDArea",
-        "torrent_name": "阿甘正传 Forrest Gump 1994 Bluray 2160p x265 10bit HDR 5Audios mUHD-FRDS",
-        "description": "【阿甘正传/福雷斯特·冈普】 mUHD作品 4k HDR10版本 重制版本",
-        "pageurl": "https://hdarea.club/details.php?id=16745&hit=1",
-        "uploadvalue": 1,
-        "downloadvalue": 0.5,
-        "size": "22.63G",
-        "respix": "2160p",
-        "restype": "Bluray",
-        "reseffect": "HDR",
-        "releasegroup": "FRDS",
-        "video_encode": "X265 10bit",
-        "labels": []
-      },
-      {
-        "id": 1,
-        "seeders": 453,
-        "enclosure": "https://hdarea.club/download.php?id=48361",
-        "site": "HDArea",
-        "torrent_name": "Forrest Gump 1994 BluRay 1080p x265 10bit 2Audio MNHD-FRDS",
-        "description": "阿甘正传Top250 #13 获奥斯卡6项大奖 国英双语 10bit HEVC版本",
-        "pageurl": "https://hdarea.club/details.php?id=48361&hit=1",
-        "uploadvalue": 2,
-        "downloadvalue": 1,
-        "size": "7.26G",
-        "respix": "1080p",
-        "restype": "BluRay",
-        "reseffect": "",
-        "releasegroup": "FRDS",
-        "video_encode": "X265 10bit",
-        "labels": []
-      }
-    ]
+interface SearchKeywordResponse {
+  code: number;
+  success: boolean;
+  message: string;
+  data: any;
+}
+
+interface SearchResultResponse {
+  code: number;
+  success: boolean;
+  message: string;
+  data: {
+    total: number;
+    result: {
+      [key: string]: MovieData;
+    }
   }
-};
+}
+
+
 
 const MovieResourcesPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { startDownload } = useDownload();
   const [movie, setMovie] = useState<MovieData | null>(null);
   const [resources, setResources] = useState<TorrentResource[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [movieTitle, setMovieTitle] = useState<string>('');
 
   useEffect(() => {
-    // Simulate loading
-    setIsLoading(true);
-    
-    // Find movie in mock data
-    const movieKey = Object.keys(mockData).find(key => mockData[key].tmdbid === id);
-    
-    if (movieKey && mockData[movieKey]) {
-      setMovie(mockData[movieKey]);
-      setResources(mockData[movieKey].torrent_dict);
-    } else {
-      setError('Movie not found');
-    }
-    
-    setIsLoading(false);
-  }, [id]);
+    const fetchMovieResources = async () => {
+      if (!id) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Check if movie data was passed via location state
+        const passedMovie = location.state?.movie;
+        
+        if(!passedMovie && !id) {
+          throw new Error('Movie ID is required');
+        }
+
+        // Use the movie data passed from the previous page
+        setMovieTitle(passedMovie.title);
+        
+        // Now use the title to search for resources
+        const searchParams = {
+          search_word: passedMovie.title
+        };
+
+        // First API call to /search/keyword with 30s timeout
+        const searchResponse = await apiRequest<SearchKeywordResponse>('/search/keyword', {
+          method: 'POST',
+          urlEncoded: true,
+          body: searchParams,
+          timeout: 30000 // 30 seconds timeout
+        });
+
+        if (!searchResponse.success) {
+          throw new Error(searchResponse.message || 'Search failed');
+        }
+
+        // Second API call to /search/result to get the actual results
+        const resultsResponse = await apiRequest<SearchResultResponse>('/search/result', {
+          method: 'POST',
+          urlEncoded: true,
+          body: {}
+        });
+
+        if (!resultsResponse.success) {
+          throw new Error(resultsResponse.message || 'Failed to fetch search results');
+        }
+
+        // Process the results
+        const results = resultsResponse.data.result;
+        const movieKeys = Object.keys(results);
+
+        if (movieKeys.length > 0) {
+          const firstMovieKey = movieKeys[0];
+          const movieData = results[firstMovieKey];
+          setMovie(movieData);
+
+          // Extract torrent resources
+          if (movieData.torrent_dict && Array.isArray(movieData.torrent_dict)) {
+            // Handle flat array of torrent resources
+            setResources(movieData.torrent_dict);
+          } else if (movieData.torrent_dict) {
+            // Handle nested structure as shown in the sample response
+            const torrents: TorrentResource[] = [];
+            
+            // Process the nested torrent_dict structure
+            Object.entries(movieData.torrent_dict).forEach(([_, typeData]: [string, any]) => {
+              if (Array.isArray(typeData)) {
+                typeData.forEach((item: any) => {
+                  if (Array.isArray(item) && item.length > 1) {
+                    const [_, resolutions] = item;
+                    
+                    Object.values(resolutions).forEach((resolution: any) => {
+                      Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
+                        torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
+                          torrents.push(torrent);
+                        });
+                      });
+                    });
+                  }
+                });
+              }
+            });
+            
+            setResources(torrents);
+          }
+        } else {
+          setError('No resources found for this movie');
+        }
+        
+      } catch (err) {
+        setError('Failed to load resources. Please try again.');
+        console.error('Movie resources error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMovieResources();
+  }, [id, searchParams, location.state]);
 
   const handleDownload = async (resource: TorrentResource) => {
     try {

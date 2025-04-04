@@ -50,8 +50,8 @@ const SearchResultsPage: React.FC = () => {
     fetchResults();
   }, [query]);
 
-  const handleMovieClick = (id: number, type: string) => {
-    const mediaType = type === '动漫' || type === '电视剧' ? 'TV' : 'MOV';
+  const handleMovieClick = (id: number, media_type: string) => {
+    const mediaType = media_type === '动漫' || media_type === '电视剧' ? 'TV' : 'MOV';
     navigate(`/movie/${id}?type=${mediaType}`);
   };
 
@@ -101,7 +101,7 @@ const SearchResultsPage: React.FC = () => {
             {results.map((result) => (
               <div 
                 key={result.id}
-                onClick={() => handleMovieClick(result.id, result.type)}
+                onClick={() => handleMovieClick(result.id, result.media_type)}
                 className="bg-gray-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200 cursor-pointer shadow-lg"
               >
                 <div className="relative">

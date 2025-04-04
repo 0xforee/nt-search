@@ -6,6 +6,7 @@ interface ApiOptions {
   headers?: Record<string, string>;
   body?: any;
   urlEncoded?: boolean;
+  timeout?: number;
 }
 
 export const API_BASE_URL = 'http://localhost:3000/api/v1';
@@ -52,6 +53,7 @@ export async function apiRequest<T>(endpoint: string, options: ApiOptions = {}):
     headers = {},
     body,
     urlEncoded = false,
+    timeout,
   } = options;
 
   // Prepare request config
@@ -60,6 +62,11 @@ export async function apiRequest<T>(endpoint: string, options: ApiOptions = {}):
     url: endpoint,
     headers: { ...headers }
   };
+  
+  // Apply custom timeout if provided
+  if (timeout) {
+    config.timeout = timeout;
+  }
 
   // Prepare request data
   if (body) {
