@@ -9,7 +9,7 @@ interface DownloadContextType {
   addDownload: (download: Omit<Download, 'id' | 'startedAt'>) => Promise<string>;
   retryDownload: (download: Download) => Promise<void>;
   removeDownload: (downloadId: string) => Promise<void>;
-  updateDownloadProgress: (downloadId: string, progress: number, speed: number) => void;
+  updateDownloadProgress: (downloadId: string, progress: number, speed: string) => void;
   completeDownload: (downloadId: string) => void;
   failDownload: (downloadId: string, error: string) => void;
   startDownload: (resourceId: string, movieId: string) => Promise<string>;
@@ -48,7 +48,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         id: tempId,
         startedAt: new Date().toISOString(),
         progress: 0,
-        speed: 0,
+        speed: '',
         status: 'pending'
       };
       
@@ -98,7 +98,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         movieId: download.movieId,
         status: 'pending',
         progress: 0,
-        speed: 0
+        speed: ''
       };
       
       // Use the addDownload function to initiate the download again
@@ -110,7 +110,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [addDownload]);
 
-  const updateDownloadProgress = useCallback((downloadId: string, progress: number, speed: number) => {
+  const updateDownloadProgress = useCallback((downloadId: string, progress: number, speed: string) => {
     setActiveDownloads(prev =>
       prev.map(download =>
         download.id === downloadId
@@ -187,19 +187,12 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         getDownloadInfoService(downloadIds).then(response => {
           if (response && response.success && response.data) {
             // Handle batch response - could be a single object or an array depending on API
-            const downloadInfos = Array.isArray(response.data) ? response.data : [response.data];
+            const downloadInfos = Array.isArray(response.data.torrents) ? response.data.torrents : [response.data.torrents];
             
             // Update each download with its info
             downloadInfos.forEach(info => {
-              const { id, progress, speed, status } = info;
-              
-              if (status === 'completed') {
-                completeDownload(id);
-              } else if (status === 'failed') {
-                failDownload(id, info.error || 'Download failed');
-              } else {
+              const { id, progress, speed, state } = info;
                 updateDownloadProgress(id, progress, speed);
-              }
             });
           }
         }).catch(error => {
@@ -261,7 +254,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           ...completedDownload,
           status: 'completed',
           progress: 100,
-          speed: 0,
+          speed: '',
           completedAt: new Date().toISOString()
         };
         setDownloadHistory(history => [updatedDownload, ...history]);
@@ -296,7 +289,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         movieId,
         status: 'pending',
         progress: 0,
-        speed: 0
+        speed: ''
       };
       
       const downloadId = await addDownload(downloadData);

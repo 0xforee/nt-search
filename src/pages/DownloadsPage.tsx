@@ -55,7 +55,7 @@ const DownloadsPage: React.FC = () => {
                 const image = (download as any).image || '';
                 const name = (download as any).name || '';
                 const state = (download as any).state || download.status;
-                const speedText = typeof download.speed === 'string' ? download.speed : `${download.speed.toFixed(1)} MB/s`;
+                const speedText = typeof download.speed === 'string' ? download.speed : `${download.speed} MB/s`;
                 
                 return (
                   <div key={download.id} className="bg-gray-800 rounded-lg p-4">

@@ -40,6 +40,24 @@ interface DownloadSearchResponse {
   };
 }
 
+interface DownloadInfoResponse {
+  code: number;
+  success: boolean;
+  message: string;
+  data: {
+    torrents: DownloadInfo[];
+  }
+}
+
+interface DownloadInfo {
+  id: string;
+  name: string;
+  speed: string;
+  state: string;
+  site_url: string;
+  progress: number;
+}
+
 /**
  * Initiates a download by searching for a resource by ID
  * @param resourceId The ID of the resource to download
@@ -121,7 +139,7 @@ export async function stopDownload(downloadId: string): Promise<any> {
  * @returns Promise with detailed download information. When multiple IDs are provided,
  * the response will contain an array of download information objects.
  */
-export async function getDownloadInfo(downloadId: string): Promise<any> {
+export async function getDownloadInfo(downloadId: string): Promise<DownloadInfoResponse> {
   return apiRequest('/download/info', {
     method: 'POST',
     urlEncoded: true,

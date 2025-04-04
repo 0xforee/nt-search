@@ -68,7 +68,7 @@ export interface Download {
   movieId: string;
   status: 'pending' | 'downloading' | 'completed' | 'failed' | 'paused';
   progress: number;
-  speed: number;
+  speed: string;
   startedAt: string;
   completedAt?: string;
   error?: string;
