@@ -12,17 +12,7 @@ const HomePage: React.FC = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-
-    setIsSearching(true);
-    try {
-      // TODO: Implement actual search API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    } catch (error) {
-      console.error('Search failed:', error);
-    } finally {
-      setIsSearching(false);
-    }
+    navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
   };
 
   return (

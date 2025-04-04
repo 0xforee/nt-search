@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
-import { SearchItem } from '../types';
+import { SearchItem, SearchResponse } from '../types';
+import { apiRequest } from '../services/api';
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -19,32 +20,19 @@ const SearchResultsPage: React.FC = () => {
       setError(null);
 
       try {
-        const token = localStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('Authentication token not found');
-        }
+        // Using apiRequest from the API service instead of direct fetch
+        const searchParams = {
+          type: 'SEARCH',
+          subtype: '',
+          page: '1',
+          keyword: query
+        };
 
-        const formData = new URLSearchParams();
-        formData.append('type', 'SEARCH');
-        formData.append('subtype', '');
-        formData.append('page', '1');
-        formData.append('keyword', query);
-
-        const response = await fetch('http://localhost:3000/api/v1/recommend/list', {
+        const data = await apiRequest<SearchResponse>('/recommend/list', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'accept': 'application/json',
-            'Authorization': token
-          },
-          body: formData.toString(),
+          urlEncoded: true,
+          body: searchParams
         });
-
-        if (!response.ok) {
-          throw new Error('Search request failed');
-        }
-
-        const data = await response.json();
         
         if (!data.success) {
           throw new Error(data.message || 'Search failed');
@@ -69,7 +57,7 @@ const SearchResultsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <MainLayout>
+      <MainLayout title={`Search Results for "${query}"`}>
         <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
           <div className="flex items-center space-x-2">
             <svg className="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -85,7 +73,7 @@ const SearchResultsPage: React.FC = () => {
 
   if (error) {
     return (
-      <MainLayout>
+      <MainLayout title={`Search Results for "${query}"`}>
         <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
           <div className="text-center">
             <p className="text-red-500 mb-4">{error}</p>
