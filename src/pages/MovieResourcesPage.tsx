@@ -129,31 +129,54 @@ const MovieResourcesPage: React.FC = () => {
           setMovie(movieData);
 
           // Extract torrent resources
-          if (movieData.torrent_dict && Array.isArray(movieData.torrent_dict)) {
-            // Handle flat array of torrent resources
-            setResources(movieData.torrent_dict);
-          } else if (movieData.torrent_dict) {
+          if (movieData.torrent_dict) {
             // Handle nested structure as shown in the sample response
             const torrents: TorrentResource[] = [];
             
             // Process the nested torrent_dict structure
-            Object.entries(movieData.torrent_dict).forEach(([_, typeData]: [string, any]) => {
-              if (Array.isArray(typeData)) {
-                typeData.forEach((item: any) => {
-                  if (Array.isArray(item) && item.length > 1) {
-                    const [_, resolutions] = item;
-                    
-                    Object.values(resolutions).forEach((resolution: any) => {
+            if (Array.isArray(movieData.torrent_dict)) {
+              // Format: [['MOV', {...}]]
+              movieData.torrent_dict.forEach((item: any) => {
+                if (Array.isArray(item) && item.length > 1) {
+                  const [mediaType, resolutions] = item;
+                  
+                  // Iterate through each resolution type (1080p_bluray, 2160p_, etc.)
+                  Object.values(resolutions).forEach((resolution: any) => {
+                    // Check if group_torrents exists
+                    if (resolution.group_torrents) {
+                      // Iterate through each group in group_torrents
                       Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
-                        torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
-                          torrents.push(torrent);
+                        // Extract torrents from torrent_list
+                        if (torrentGroup.torrent_list && Array.isArray(torrentGroup.torrent_list)) {
+                          torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
+                            torrents.push(torrent);
+                          });
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            } else {
+              // Alternative structure handling
+              Object.entries(movieData.torrent_dict).forEach(([_, typeData]: [string, any]) => {
+                if (Array.isArray(typeData)) {
+                  typeData.forEach((item: any) => {
+                    if (Array.isArray(item) && item.length > 1) {
+                      const [_, resolutions] = item;
+                      
+                      Object.values(resolutions).forEach((resolution: any) => {
+                        Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
+                          torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
+                            torrents.push(torrent);
+                          });
                         });
                       });
-                    });
-                  }
-                });
-              }
-            });
+                    }
+                  });
+                }
+              });
+            }
             
             setResources(torrents);
           }
@@ -226,19 +249,8 @@ const MovieResourcesPage: React.FC = () => {
   }
 
   return (
-    <MainLayout>
+    <MainLayout title={`Resources for "${movie.title}"`}>
       <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <button 
-          onClick={() => navigate(-1)}
-          className="mb-6 text-white hover:text-blue-400 transition-colors flex items-center"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-          </svg>
-          Back to Movie
-        </button>
-
         {/* Movie Header */}
         <div className="relative mb-8">
           <img 
