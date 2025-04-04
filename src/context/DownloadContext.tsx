@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { initiateDownload, trackDownloadProgress, cancelDownloadRequest, getActiveDownloads, getDownloadHistory, removeDownload as removeDownloadService, startDownload as startDownloadService, stopDownload as stopDownloadService, getDownloadInfo as getDownloadInfoService } from '../services/downloadService';
+import { initiateDownload, getActiveDownloads, getDownloadHistory, removeDownload as removeDownloadService, startDownload as startDownloadService, stopDownload as stopDownloadService, getDownloadInfo as getDownloadInfoService } from '../services/downloadService';
 import { Download } from '../types';
 
 interface DownloadContextType {
@@ -99,8 +99,8 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         )
       );
       
-      // Call API to cancel the download
-      await cancelDownloadRequest(downloadId);
+      // Call API to stop the download
+      await stopDownloadService(downloadId);
       
       // Remove from active downloads
       setActiveDownloads(prev => prev.filter(d => d.id !== downloadId));
@@ -157,7 +157,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Function to poll for download progress updates from the server
   const pollDownloadProgress = useCallback(async (downloadId: string) => {
     try {
-      const response = await trackDownloadProgress(downloadId);
+      const response = await getDownloadInfoService(downloadId);
       
       if (response && response.success) {
         const { progress, speed, status } = response.data;

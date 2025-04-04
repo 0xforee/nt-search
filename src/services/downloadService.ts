@@ -54,28 +54,6 @@ export async function initiateDownload(resourceId: string): Promise<DownloadSear
 }
 
 /**
- * Tracks the progress of an active download
- * @param downloadId The ID of the download to track
- * @returns Promise with download progress information
- */
-export async function trackDownloadProgress(downloadId: string): Promise<any> {
-  return apiRequest(`/download/status/${downloadId}`, {
-    method: 'GET'
-  });
-}
-
-/**
- * Cancels an active download
- * @param downloadId The ID of the download to cancel
- * @returns Promise with cancellation result
- */
-export async function cancelDownloadRequest(downloadId: string): Promise<any> {
-  return apiRequest(`/download/cancel/${downloadId}`, {
-    method: 'POST'
-  });
-}
-
-/**
  * Gets a list of all active downloads
  * @returns Promise with active downloads information
  */
