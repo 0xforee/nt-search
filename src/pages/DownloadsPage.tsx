@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDownload } from '../context/DownloadContext';
+import { Container, Box, Typography, Button, LinearProgress, List, ListItem, ListItemText, ListItemIcon, IconButton, Pagination } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import CloseIcon from '@mui/icons-material/Close';
+import ReplayIcon from '@mui/icons-material/Replay';
 
 const DownloadsPage: React.FC = () => {
   const { 
@@ -31,213 +36,178 @@ const DownloadsPage: React.FC = () => {
   }, []);
 
   return (
-      <div className="container mx-auto px-4 py-8">
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Active Downloads */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-4">Active Downloads</h2>
-          <div className="space-y-4">
+        <Box mb={4}>
+          <Typography variant="h6" component="h2" color="text.primary" mb={2}>Active Downloads</Typography>
+          <List>
             {activeDownloads.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">
-                No active downloads
-              </div>
+              <Box textAlign="center" color="text.secondary" py={4}>
+                <Typography variant="body1">No active downloads</Typography>
+              </Box>
             ) : (
               activeDownloads.map(download => {
-                // Extract title and image from the download object if available
                 const title = (download as any).title || 'Movie Title';
                 const image = (download as any).image || '';
                 const state = (download as any).state || download.status;
                 const speedText = typeof download.speed === 'string' ? download.speed : `${download.speed} MB/s`;
                 
                 return (
-                  <div key={download.id} className="bg-gray-800 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        {image ? (
-                          <img src={image} alt={title} className="w-8 h-12 object-cover rounded" />
-                        ) : (
-                          <div className="w-8 h-12 bg-gray-700 rounded"></div>
-                        )}
-                        <div>
-                          <h3 className="text-white text-sm">{title}</h3>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {/* Play/Pause Button */}
-                        {state === 'paused' || state === 'Stoped' ? (
-                          <button 
-                            onClick={() => startPausedDownload(download.id)}
-                            className="text-green-500 hover:text-green-400 transition-colors"
-                            title="Start Download"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </button>
-                        ) : (
-                          <button 
-                            onClick={() => pauseActiveDownload(download.id)}
-                            className="text-yellow-500 hover:text-yellow-400 transition-colors"
-                            title="Pause Download"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </button>
-                        )}
-                        <button 
-                          onClick={() => removeDownload(download.id)}
-                          className="text-gray-400 hover:text-white transition-colors"
-                          title="Remove Download"
+                  <ListItem key={download.id} sx={{ bgcolor: 'background.paper', borderRadius: 1, mb: 2, boxShadow: 1 }}>
+                    <ListItemIcon>
+                      {image ? (
+                        <img src={image} alt={title} style={{ width: 40, height: 60, objectFit: 'cover', borderRadius: 4 }} />
+                      ) : (
+                        <Box sx={{ width: 40, height: 60, bgcolor: 'grey.700', borderRadius: 4 }}></Box>
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="subtitle1" color="text.primary">{title}</Typography>}
+                      secondary={
+                        <Box>
+                          <Typography variant="body2" color="text.secondary" component="span">{download.progress}% - {state} - {speedText}</Typography>
+                          <LinearProgress variant="determinate" value={download.progress} sx={{ mt: 0.5 }} />
+                        </Box>
+                      }
+                      secondaryTypographyProps={{ component: 'div' }}
+                    />
+                    <Box display="flex" alignItems="center" gap={1}>
+                      {state === 'paused' || state === 'Stoped' ? (
+                        <IconButton 
+                          onClick={() => startPausedDownload(download.id)}
+                          color="success"
+                          title="Start Download"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    {/* Progress Bar */}
-                    <div className="w-full bg-gray-700 rounded-full h-1.5 mb-2">
-                      <div 
-                        className={`${state === 'Stoped' ? 'bg-yellow-500' : 'bg-blue-500'} h-1.5 rounded-full transition-all duration-300`} 
-                        style={{ width: `${download.progress}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-400">{download.progress}%</span>
-                      <span className="text-gray-400">{state}</span>
-                      <span className="text-gray-400">{speedText}</span>
-                    </div>
-                  </div>
+                          <PlayArrowIcon />
+                        </IconButton>
+                      ) : (
+                        <IconButton 
+                          onClick={() => pauseActiveDownload(download.id)}
+                          color="warning"
+                          title="Pause Download"
+                        >
+                          <PauseIcon />
+                        </IconButton>
+                      )}
+                      <IconButton 
+                        onClick={() => removeDownload(download.id)}
+                        color="error"
+                        title="Remove Download"
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    </Box>
+                  </ListItem>
                 );
               })
             )}
-          </div>
-        </div>
+          </List>
+        </Box>
 
         {/* Local Download History */}
         {downloadHistory.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-white mb-4">Recent Downloads</h2>
-            <div className="space-y-4">
+          <Box mb={4}>
+            <Typography variant="h6" component="h2" color="text.primary" mb={2}>Recent Downloads</Typography>
+            <List>
               {downloadHistory.map(download => {
-                // Extract title and image from the download object if available
                 const title = (download as any).title || 'Movie Title';
                 const image = (download as any).image || '';
                 const name = (download as any).name || '';
                 
                 return (
-                  <div key={download.id} className="bg-gray-800 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {image ? (
-                          <img src={image} alt={title} className="w-8 h-12 object-cover rounded" />
-                        ) : (
-                          <div className="w-8 h-12 bg-gray-700 rounded"></div>
-                        )}
-                        <div>
-                          <h3 className="text-white text-sm">{title}</h3>
-                          <p className="text-gray-400 text-xs">
-                            {download.status === 'completed' ? 'Completed' : 'Failed'} • {name}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {download.status === 'failed' && (
-                          <button 
-                            onClick={() => retryDownload(download)}
-                            className="text-blue-500 hover:text-blue-400 transition-colors"
-                          >
-                            Retry
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  <ListItem key={download.id} sx={{ bgcolor: 'background.paper', borderRadius: 1, mb: 2, boxShadow: 1 }}>
+                    <ListItemIcon>
+                      {image ? (
+                        <img src={image} alt={title} style={{ width: 40, height: 60, objectFit: 'cover', borderRadius: 4 }} />
+                      ) : (
+                        <Box sx={{ width: 40, height: 60, bgcolor: 'grey.700', borderRadius: 4 }}></Box>
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="subtitle1" color="text.primary">{title}</Typography>}
+                      secondary={
+                        <Typography variant="body2" color="text.secondary" component="span">
+                          {download.status === 'completed' ? 'Completed' : 'Failed'} • {name}
+                        </Typography>
+                      }
+                      secondaryTypographyProps={{ component: 'div' }}
+                    />
+                    <Box>
+                      {download.status === 'failed' && (
+                        <IconButton 
+                          onClick={() => retryDownload(download)}
+                          color="primary"
+                        >
+                          <ReplayIcon />
+                        </IconButton>
+                      )}
+                    </Box>
+                  </ListItem>
                 );
               })}
-            </div>
-          </div>
+            </List>
+          </Box>
         )}
         
         {/* API Download History */}
-        <div>
-          <h2 className="text-lg font-semibold text-white mb-4">Download History</h2>
-          <div className="space-y-4">
+        <Box>
+          <Typography variant="h6" component="h2" color="text.primary" mb={2}>Download History</Typography>
+          <List>
             {apiDownloadHistory.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">
-                No download history
-              </div>
+              <Box textAlign="center" color="text.secondary" py={4}>
+                <Typography variant="body1">No download history</Typography>
+              </Box>
             ) : (
               apiDownloadHistory.map((item: any) => {
                 return (
-                  <div key={item.id} className="bg-gray-800 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {item.image ? (
-                          <img src={item.image} alt={item.title} className="w-8 h-12 object-cover rounded" />
-                        ) : (
-                          <div className="w-8 h-12 bg-gray-700 rounded"></div>
-                        )}
-                        <div>
-                          <h3 className="text-white text-sm">{item.title}</h3>
-                          <p className="text-gray-400 text-xs">
+                  <ListItem key={item.id} sx={{ bgcolor: 'background.paper', borderRadius: 1, mb: 2, boxShadow: 1 }}>
+                    <ListItemIcon>
+                      {item.image ? (
+                        <img src={item.image} alt={item.title} style={{ width: 40, height: 60, objectFit: 'cover', borderRadius: 4 }} />
+                      ) : (
+                        <Box sx={{ width: 40, height: 60, bgcolor: 'grey.700', borderRadius: 4 }}></Box>
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="subtitle1" color="text.primary">{item.title}</Typography>}
+                      secondary={
+                        <Box>
+                          <Typography variant="body2" color="text.secondary" component="span">
                             {item.media_type} • {item.year} • {item.site}
-                          </p>
-                          <p className="text-gray-500 text-xs mt-1 line-clamp-2">
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" mt={0.5} noWrap component="span">
                             {item.overview}
-                          </p>
-                          <p className="text-gray-400 text-xs mt-1">
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" mt={0.5} component="span">
                             Downloaded on {item.date}
-                          </p>
-                        </div>
-                      </div>
-                      {/* Remove button removed as history cannot be deleted */}
-                    </div>
-                  </div>
+                          </Typography>
+                        </Box>
+                      }
+                      secondaryTypographyProps={{ component: 'div' }}
+                    />
+                  </ListItem>
                 );
               })
             )}
             
             {/* Pagination */}
             {apiDownloadHistory.length > 0 && totalHistoryPages > 1 && (
-              <div className="flex justify-center mt-6">
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => {
-                      if (historyPage > 1) {
-                        const newPage = historyPage - 1;
-                        setHistoryPage(newPage);
-                        fetchDownloadHistory(newPage);
-                      }
-                    }}
-                    disabled={historyPage <= 1}
-                    className={`px-3 py-1 rounded ${historyPage <= 1 ? 'bg-gray-700 text-gray-500' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
-                  >
-                    Previous
-                  </button>
-                  <span className="px-3 py-1 bg-gray-700 rounded text-white">
-                    {historyPage} / {totalHistoryPages}
-                  </span>
-                  <button
-                    onClick={() => {
-                      if (historyPage < totalHistoryPages) {
-                        const newPage = historyPage + 1;
-                        setHistoryPage(newPage);
-                        fetchDownloadHistory(newPage);
-                      }
-                    }}
-                    disabled={historyPage >= totalHistoryPages}
-                    className={`px-3 py-1 rounded ${historyPage >= totalHistoryPages ? 'bg-gray-700 text-gray-500' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
+              <Box display="flex" justifyContent="center" mt={3}>
+                <Pagination
+                  count={totalHistoryPages}
+                  page={historyPage}
+                  onChange={(event, value) => {
+                    setHistoryPage(value);
+                    fetchDownloadHistory(value);
+                  }}
+                  color="primary"
+                  sx={{'& .MuiPaginationItem-root': { color: 'text.primary' }}}
+                />
+              </Box>
             )}
-          </div>
-        </div>
-      </div>
+          </List>
+        </Box>
+      </Container>
   );
 };
 

@@ -5,6 +5,24 @@ import { useSearch } from '../context/SearchContext';
 import MainLayout from '../layouts/MainLayout';
 import { apiRequest } from '../services/api';
 import { MovieData, TorrentResource } from '../types';
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Button,
+  Container,
+  Card,
+  CardMedia,
+  CardContent,
+  Chip,
+  Stack,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+} from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface SearchKeywordResponse {
   code: number;
@@ -58,56 +76,25 @@ const MovieResourcesPage: React.FC = () => {
       try {
         // Check if movie data was passed via location state
         const passedMovie = location.state?.movie;
-        
-        if(!passedMovie && !id) {
-          throw new Error('Movie ID is required');
+        let currentMovie = passedMovie;
+
+        if (!currentMovie && id) {
+          // If no movie data passed via state, we can't proceed without it.
+          // This scenario should ideally be handled by navigating from a page
+          // that provides movie data (e.g., search results or movie details).
+          throw new Error('Movie data not found. Please navigate from a valid movie page.');
         }
         
-        // Now use the title to search for resources
-        const searchParams = {
-          search_word: passedMovie.title
-        };
-
-        // First API call to /search/keyword with 30s timeout
-        const searchResponse = await apiRequest<SearchKeywordResponse>('/search/keyword', {
-          method: 'POST',
-          urlEncoded: true,
-          body: searchParams,
-          timeout: 30000 // 30 seconds timeout
-        });
-
-        if (!searchResponse.success) {
-          throw new Error(searchResponse.message || 'Search failed');
+        if(!currentMovie) {
+          throw new Error('Movie ID is required or movie data not found');
         }
+        
+        // Set the movie data and extract torrents
+        setMovieResources(id, currentMovie);
+        setMovie(currentMovie);
 
-        // Second API call to /search/result to get the actual results
-        const resultsResponse = await apiRequest<SearchResultResponse>('/search/result', {
-          method: 'POST',
-          urlEncoded: true,
-          body: {}
-        });
-
-        if (!resultsResponse.success) {
-          throw new Error(resultsResponse.message || 'Failed to fetch search results');
-        }
-
-        // Process the results
-        const results = resultsResponse.data.result;
-        const movieKeys = Object.keys(results);
-
-        if (movieKeys.length > 0) {
-          const firstMovieKey = movieKeys[0];
-          const movieData = results[firstMovieKey];
-          setMovieResources(id, movieData);
-          setMovie(movieData);
-
-          // Extract torrent resources
-          const torrents = extractTorrents(movieData.torrent_dict);
-          setResources(torrents);
-          
-        } else {
-          setError('No resources found for this movie');
-        }
+        const torrents = extractTorrents(currentMovie.torrent_dict);
+        setResources(torrents);
         
       } catch (err) {
         setError('Failed to load resources. Please try again.');
@@ -192,15 +179,19 @@ const MovieResourcesPage: React.FC = () => {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <div className="flex items-center space-x-2">
-            <svg className="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span className="text-white">Loading resources...</span>
-          </div>
-        </div>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          minHeight="calc(100vh - 8rem)"
+        >
+          <Box display="flex" alignItems="center" gap={2}>
+            <CircularProgress size={30} />
+            <Typography variant="h6" color="text.secondary">
+              Loading resources...
+            </Typography>
+          </Box>
+        </Box>
       </MainLayout>
     );
   }
@@ -208,84 +199,167 @@ const MovieResourcesPage: React.FC = () => {
   if (error || !movie) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <div className="text-center">
-            <p className="text-red-500 mb-4">{error || 'Movie not found'}</p>
-            <button 
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          minHeight="calc(100vh - 8rem)"
+        >
+          <Box textAlign="center">
+            <Typography variant="body1" color="error" mb={2}>
+              {error || 'Movie not found'}
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<ArrowBackIcon />}
               onClick={() => navigate(-1)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
             >
               Go Back
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Box>
+        </Box>
       </MainLayout>
     );
   }
 
   return (
     <MainLayout title={`Resources for "${movie.title}"`}>
-      <div className="container mx-auto px-4 py-8">
+      <Container maxWidth="md" sx={{ py: 4 }}>
         {/* Movie Header */}
-        <div className="relative mb-8">
-          <img 
-            src={movie.image} 
-            alt={movie.title}
-            className="w-full h-[200px] object-cover rounded-lg"
-          />
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 to-transparent h-32 rounded-b-lg"></div>
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h1 className="text-xl font-bold text-white mb-1">{movie.title}</h1>
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <span>{movie.year}</span>
-              <span>•</span>
-              <span>{movie.type}</span>
-              <span>•</span>
-              <span className="flex items-center">
-                <span className="text-yellow-400">★</span>
-                <span className="ml-1">{movie.vote}</span>
-              </span>
-            </div>
-          </div>
-        </div>
+        <Box sx={{ position: 'relative', mb: 4 }}>
+          <Card>
+            <CardMedia
+              component="img"
+              image={movie.image}
+              alt={movie.title}
+              sx={{
+                width: '100%',
+                height: 200,
+                objectFit: 'cover',
+              }}
+            />
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background:
+                  'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+                height: 120,
+                borderRadius: '0 0 8px 8px',
+              }}
+            />
+            <CardContent
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                p: 2,
+                color: 'white',
+              }}
+            >
+              <Typography variant="h5" component="h1" fontWeight="bold" mb={0.5}>
+                {movie.title}
+              </Typography>
+              <Stack direction="row" alignItems="center" spacing={1} fontSize="0.875rem">
+                <Typography variant="body2" color="text.secondary">
+                  {movie.year}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  •
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {movie.type}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  •
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  <Typography component="span" role="img" aria-label="star">
+                    ⭐
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {movie.vote}
+                  </Typography>
+                </Stack>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Box>
 
         {/* Resources List */}
-        <div className="space-y-4">
-          <h2 className="text-white text-lg font-semibold mb-4">Available Resources</h2>
-          
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" component="h2" mb={2}>
+            Available Resources
+          </Typography>
+
           {resources.length === 0 ? (
-            <div className="text-center text-gray-400 py-8">
-              No resources available for this movie
-            </div>
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="body1" color="text.secondary">
+                No resources available for this movie
+              </Typography>
+            </Box>
           ) : (
-            resources.map((resource) => (
-              <div key={resource.id} className="bg-gray-800 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="text-white text-sm">{resource.torrent_name}</p>
-                    <p className="text-gray-400 text-xs mt-1">{resource.description}</p>
-                    <div className="flex items-center gap-4 mt-2">
-                      <span className="text-gray-400 text-xs">{resource.respix}</span>
-                      <span className="text-gray-400 text-xs">•</span>
-                      <span className="text-gray-400 text-xs">{resource.video_encode}</span>
-                      <span className="text-gray-400 text-xs">•</span>
-                      <span className="text-gray-400 text-xs">{resource.size}</span>
-                      <span className="text-gray-400 text-xs">•</span>
-                      <span className="text-gray-400 text-xs">{resource.seeders} seeders</span>
-                    </div>
-                  </div>
-                  <button 
+            <List>
+              {resources.map((resource) => (
+                <ListItem
+                  key={resource.id}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    borderRadius: 1,
+                    mb: 2,
+                    boxShadow: 1,
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    justifyContent: 'space-between',
+                    p: 2,
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      <Typography variant="subtitle1" component="span">
+                        {resource.torrent_name}
+                      </Typography>
+                    }
+                    secondary={
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" mt={0.5}>
+                          {resource.description}
+                        </Typography>
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          spacing={1}
+                          mt={1}
+                          flexWrap="wrap"
+                        >
+                          <Chip label={resource.respix} size="small" />
+                          <Chip label={resource.video_encode} size="small" />
+                          <Chip label={resource.size} size="small" />
+                          <Chip label={`${resource.seeders} seeders`} size="small" />
+                        </Stack>
+                      </Box>
+                    }
+                    sx={{ flexGrow: 1, mb: { xs: 1, sm: 0 } }}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<DownloadIcon />}
                     onClick={() => handleDownload(resource)}
-                    className="bg-blue-500 text-white text-xs px-3 py-1 rounded ml-2 hover:bg-blue-600 transition-colors"
+                    sx={{ ml: { sm: 2 } }}
                   >
                     Download
-                  </button>
-                </div>
-              </div>
-            ))
+                  </Button>
+                </ListItem>
+              ))}
+            </List>
           )}
-        </div>
-      </div>
+        </Box>
+      </Container>
     </MainLayout>
   );
 };

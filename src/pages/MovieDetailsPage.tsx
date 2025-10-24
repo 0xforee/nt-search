@@ -3,6 +3,25 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import { MovieDetails, MovieDetailsResponse } from '../types';
 import { apiRequest } from '../services/api';
+import {
+  Container,
+  Box,
+  Typography,
+  Button,
+  CircularProgress,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Chip,
+  Stack,
+  Avatar,
+  IconButton,
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import StarIcon from '@mui/icons-material/Star';
+import InfoIcon from '@mui/icons-material/Info';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 const MovieDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,15 +73,10 @@ const MovieDetailsPage: React.FC = () => {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <div className="flex items-center space-x-2">
-            <svg className="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span className="text-white">Loading movie details...</span>
-          </div>
-        </div>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
+          <CircularProgress color="primary" size={60} />
+          <Typography variant="h6" color="text.primary" ml={2}>Loading movie details...</Typography>
+        </Box>
       </MainLayout>
     );
   }
@@ -70,127 +84,144 @@ const MovieDetailsPage: React.FC = () => {
   if (error || !movie) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <div className="text-center">
-            <p className="text-red-500 mb-4">{error || 'Movie not found'}</p>
-            <button 
-              onClick={() => navigate(-1)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Go Back
-            </button>
-          </div>
-        </div>
+        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
+          <Typography variant="h6" color="error" mb={2}>{error || 'Movie not found'}</Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate(-1)}
+          >
+            Go Back
+          </Button>
+        </Box>
       </MainLayout>
     );
   }
 
   return (
     <MainLayout title={movie.title}>
-      <div className="relative">
+      <Box sx={{ position: 'relative' }}>
         {/* Background Image with Gradient Overlay */}
-        <div 
-          className="absolute inset-0 h-[500px] bg-cover bg-center w-full" 
-          style={{ 
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            height: '500px',
             backgroundImage: `url(${movie.background[0] || movie.image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            width: '100%',
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-gray-900"></div>
-        </div>
+          <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, #121212 100%)' }}></Box>
+        </Box>
 
         {/* Content */}
-        <div className="container mx-auto px-4 md:px-8 relative">
+        <Container maxWidth="lg" sx={{ position: 'relative', pt: 16, pb: 8 }}>
           {/* Movie Header */}
-          <div className="pt-32 pb-16">
-            <div className="max-w-4xl">
-              <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">{movie.title}</h1>
-              <div className="flex items-center space-x-6 mb-6">
-                <span className="text-gray-200 text-lg">{movie.year}</span>
-                <span className="text-yellow-400 text-lg font-semibold">★ {movie.vote}</span>
-                <span className="text-gray-200 text-lg">{movie.genres}</span>
-              </div>
-              <p className="text-gray-100 text-xl leading-relaxed mb-8 drop-shadow-md">{movie.overview}</p>
-            
+          <Box sx={{ maxWidth: 'lg' }}>
+            <Typography variant="h2" component="h1" color="white" fontWeight="bold" mb={2} sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>{movie.title}</Typography>
+            <Stack direction="row" spacing={3} alignItems="center" mb={3}>
+              <Typography variant="h6" color="text.secondary">{movie.year}</Typography>
+              <Chip
+                icon={<StarIcon sx={{ color: 'yellow.400 !important' }} />}
+                label={movie.vote}
+                sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: 'yellow.400', fontWeight: 'bold' }}
+              />
+              <Typography variant="h6" color="text.secondary">{movie.genres}</Typography>
+            </Stack>
+            <Typography variant="h5" color="text.secondary" lineHeight={1.6} mb={4} sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>{movie.overview}</Typography>
+
             {/* Additional Info */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+            <Grid container spacing={2} mb={4}>
               {movie.fact.map((fact, index) => (
-                <div key={index} className="bg-black/30 backdrop-blur-sm rounded-lg p-4">
-                  <h3 className="text-gray-300 text-sm font-medium">{Object.keys(fact)[0]}</h3>
-                  <p className="text-white text-base">{Object.values(fact)[0]}</p>
-                </div>
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Card sx={{ bgcolor: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(5px)', borderRadius: 2, boxShadow: 3 }}>
+                    <CardContent>
+                      <Typography variant="subtitle2" color="text.secondary" mb={1}>{Object.keys(fact)[0]}</Typography>
+                      <Typography variant="body1" color="white">{Object.values(fact)[0]}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
               ))}
-            </div>
+            </Grid>
 
             {/* View Resources Button */}
-            <button 
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<PlayArrowIcon />}
               onClick={() => navigate(`/movie/${id}/resources?type=${searchParams.get('type') || 'MOV'}`, { state: { movie } })}
-              className="bg-blue-500 text-white px-8 py-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center text-lg font-medium"
+              sx={{ mt: 2, py: 2, px: 4, fontSize: '1.1rem' }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
               View Resources
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </Box>
+        </Container>
 
         {/* Content Sections */}
-        <div className="container mx-auto px-8 py-12 bg-gray-900">
-          {/* Cast Section */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-white mb-6">Cast</h2>
-            <div className="flex overflow-x-auto space-x-6 pb-6">
-              {movie.actors.slice(0, 10).map((actor) => (
-                <div key={actor.id} className="flex-none text-center w-32">
-                  <div className="w-28 h-28 mx-auto relative mb-3">
-                    <img 
-                      src={actor.image} 
+        <Box sx={{ bgcolor: 'background.default', py: 6 }}>
+          <Container maxWidth="lg">
+            {/* Cast Section */}
+            <Box mb={6}>
+              <Typography variant="h4" component="h2" color="text.primary" fontWeight="bold" mb={3}>Cast</Typography>
+              <Box sx={{ display: 'flex', overflowX: 'auto', pb: 2, '&::-webkit-scrollbar': { height: '8px' }, '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '10px' } }}>
+                {movie.actors.slice(0, 10).map((actor) => (
+                  <Box key={actor.id} sx={{ flexShrink: 0, textAlign: 'center', width: 120, mr: 3 }}>
+                    <Avatar
+                      src={actor.image}
                       alt={actor.name}
-                      className="w-full h-full object-cover rounded-full border-2 border-gray-700 hover:border-blue-500 transition-colors"
+                      sx={{ width: 96, height: 96, mx: 'auto', mb: 1.5, border: '2px solid', borderColor: 'grey.700', '&:hover': { borderColor: 'primary.main' }, transition: 'border-color 0.3s' }}
                     />
-                  </div>
-                  <div className="w-full">
-                    <h3 className="text-white text-base font-medium truncate">{actor.name}</h3>
-                    <p className="text-gray-400 text-sm truncate">{actor.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Crew Section */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-white mb-6">Crew</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {movie.crews.map((crew, index) => (
-                <div key={index} className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 hover:bg-gray-800 transition-colors">
-                  <h3 className="text-white text-lg font-medium mb-2">{Object.keys(crew)[0]}</h3>
-                  <p className="text-gray-300 text-base">{Object.values(crew)[0]}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Background Images */}
-          {movie.background.length > 0 && (
-            <div>
-              <h2 className="text-3xl font-bold text-white mb-6">Background Images</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {movie.background.map((bg, index) => (
-                  <div key={index} className="relative h-60 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-300">
-                    <img 
-                      src={bg} 
-                      alt={`${movie.title} background ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                    <Typography variant="subtitle2" color="text.primary" noWrap>{actor.name}</Typography>
+                    <Typography variant="body2" color="text.secondary" noWrap>{actor.role}</Typography>
+                  </Box>
                 ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+              </Box>
+            </Box>
+
+            {/* Crew Section */}
+            <Box mb={6}>
+              <Typography variant="h4" component="h2" color="text.primary" fontWeight="bold" mb={3}>Crew</Typography>
+              <Grid container spacing={3}>
+                {movie.crews.map((crew, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Card sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3, '&:hover': { bgcolor: 'grey.800' }, transition: 'background-color 0.3s' }}>
+                      <CardContent>
+                        <Typography variant="h6" color="text.primary" mb={1}>{Object.keys(crew)[0]}</Typography>
+                        <Typography variant="body1" color="text.secondary">{Object.values(crew)[0]}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+
+            {/* Background Images */}
+            {movie.background.length > 0 && (
+              <Box>
+                <Typography variant="h4" component="h2" color="text.primary" fontWeight="bold" mb={3}>Background Images</Typography>
+                <Grid container spacing={3}>
+                  {movie.background.map((bg, index) => (
+                    <Grid item xs={12} md={6} lg={4} key={index}>
+                      <Card sx={{ borderRadius: 2, overflow: 'hidden', boxShadow: 3, '&:hover': { transform: 'scale(1.03)' }, transition: 'transform 0.3s' }}>
+                        <CardMedia
+                          component="img"
+                          height="200"
+                          image={bg}
+                          alt={`${movie.title} background ${index + 1}`}
+                          sx={{ objectFit: 'cover' }}
+                        />
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+          </Container>
+        </Box>
+      </Box>
     </MainLayout>
   );
 };
