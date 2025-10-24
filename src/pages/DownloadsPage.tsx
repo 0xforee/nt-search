@@ -175,7 +175,7 @@ const DownloadsPage: React.FC = () => {
                           <Typography variant="body2" color="text.secondary" component="span">
                             {item.media_type} • {item.year} • {item.site}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" mt={0.5} noWrap component="span">
+                          <Typography variant="body2" color="text.secondary" mt={0.5} component="span">
                             {item.overview}
                           </Typography>
                           <Typography variant="caption" color="text.secondary" mt={0.5} component="span">

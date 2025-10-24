@@ -99,11 +99,12 @@ const SearchResultsPage: React.FC = () => {
         ) : (
           <Grid container spacing={2}>
             {searchResults.map((result) => (
-              <Grid item xs={6} sm={4} md={3} lg={2} key={result.id}>
+              <Grid item xs={6} sm={4} md={3} lg={2} key={result.id} component={"div"}>
                 <Card 
                   onClick={() => handleMovieClick(result.id, result.media_type)}
                   sx={{
-                    height: '100%',
+                    height: '20rem',
+                    width: '10rem',
                     display: 'flex',
                     flexDirection: 'column',
                     cursor: 'pointer',
@@ -118,9 +119,9 @@ const SearchResultsPage: React.FC = () => {
                     image={result.poster || '/placeholder-movie.svg'}
                     alt={result.title}
                     sx={{
-                      width: '100%',
+                      height: '14rem',
                       aspectRatio: '2/3',
-                      objectFit: 'cover',
+                      objectFit: 'fill',
                     }}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;

@@ -220,7 +220,7 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setCurrentHistoryPage(page);
         // In a real API, there would likely be pagination info
         // For now, we'll just assume there's only one page if we have results
-        setTotalHistoryPages(response.data.Items.length > 0 ? 2 : 1);
+        setTotalHistoryPages(response.data.Items.length > 0 ? Math.ceil(response.data.Items.length / 10) : 1);
       }
     } catch (error) {
       console.error('Error fetching download history:', error);

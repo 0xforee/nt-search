@@ -93,7 +93,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         </Toolbar>
       </AppBar>
 
-      <Box component="main" sx={{ flexGrow: 1, pt: 8, pb: 8 }}>
+      <Box component="main" sx={{ flexGrow: 1, pt: 2, pb: 4 }}>
         {children}
       </Box>
 

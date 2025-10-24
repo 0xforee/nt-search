@@ -117,10 +117,10 @@ const MovieDetailsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Container maxWidth="lg" sx={{ position: 'relative', pt: 16, pb: 8 }}>
+        <Container maxWidth="lg" sx={{ position: 'relative', pt: 6, pb: 8 }}>
           {/* Movie Header */}
           <Box sx={{ maxWidth: 'lg' }}>
-            <Typography variant="h2" component="h1" color="white" fontWeight="bold" mb={2} sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>{movie.title}</Typography>
+            <Typography variant="h4" component="h1" color="white" fontWeight="bold" mb={2} sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>{movie.title}</Typography>
             <Stack direction="row" spacing={3} alignItems="center" mb={3}>
               <Typography variant="h6" color="text.secondary">{movie.year}</Typography>
               <Chip
@@ -130,7 +130,7 @@ const MovieDetailsPage: React.FC = () => {
               />
               <Typography variant="h6" color="text.secondary">{movie.genres}</Typography>
             </Stack>
-            <Typography variant="h5" color="text.secondary" lineHeight={1.6} mb={4} sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>{movie.overview}</Typography>
+            <Typography variant="body1" color="text.secondary" lineHeight={1.6} mb={4} sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>{movie.overview}</Typography>
 
             {/* Additional Info */}
             <Grid container spacing={2} mb={4}>
@@ -153,7 +153,7 @@ const MovieDetailsPage: React.FC = () => {
               size="large"
               startIcon={<PlayArrowIcon />}
               onClick={() => navigate(`/movie/${id}/resources?type=${searchParams.get('type') || 'MOV'}`, { state: { movie } })}
-              sx={{ mt: 2, py: 2, px: 4, fontSize: '1.1rem' }}
+              sx={{ mt: 2, py: 2, px: 4, fontSize: '1rem' }}
             >
               View Resources
             </Button>
@@ -165,14 +165,14 @@ const MovieDetailsPage: React.FC = () => {
           <Container maxWidth="lg">
             {/* Cast Section */}
             <Box mb={6}>
-              <Typography variant="h4" component="h2" color="text.primary" fontWeight="bold" mb={3}>Cast</Typography>
+              <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>Cast</Typography>
               <Box sx={{ display: 'flex', overflowX: 'auto', pb: 2, '&::-webkit-scrollbar': { height: '8px' }, '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '10px' } }}>
                 {movie.actors.slice(0, 10).map((actor) => (
-                  <Box key={actor.id} sx={{ flexShrink: 0, textAlign: 'center', width: 120, mr: 3 }}>
+                  <Box key={actor.id} sx={{ flexShrink: 0, textAlign: 'center', width: 120 }}>
                     <Avatar
                       src={actor.image}
                       alt={actor.name}
-                      sx={{ width: 96, height: 96, mx: 'auto', mb: 1.5, border: '2px solid', borderColor: 'grey.700', '&:hover': { borderColor: 'primary.main' }, transition: 'border-color 0.3s' }}
+                      sx={{ width: 64, height: 64, mx: 'auto', mb: 1.5, '&:hover': { borderColor: 'primary.main' }, transition: 'border-color 0.3s' }}
                     />
                     <Typography variant="subtitle2" color="text.primary" noWrap>{actor.name}</Typography>
                     <Typography variant="body2" color="text.secondary" noWrap>{actor.role}</Typography>
@@ -183,13 +183,13 @@ const MovieDetailsPage: React.FC = () => {
 
             {/* Crew Section */}
             <Box mb={6}>
-              <Typography variant="h4" component="h2" color="text.primary" fontWeight="bold" mb={3}>Crew</Typography>
+              <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>Crew</Typography>
               <Grid container spacing={3}>
                 {movie.crews.map((crew, index) => (
                   <Grid item xs={12} sm={6} md={4} key={index}>
                     <Card sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3, '&:hover': { bgcolor: 'grey.800' }, transition: 'background-color 0.3s' }}>
                       <CardContent>
-                        <Typography variant="h6" color="text.primary" mb={1}>{Object.keys(crew)[0]}</Typography>
+                        <Typography variant="subtitle1" color="text.primary" mb={1}>{Object.keys(crew)[0]}</Typography>
                         <Typography variant="body1" color="text.secondary">{Object.values(crew)[0]}</Typography>
                       </CardContent>
                     </Card>
@@ -201,7 +201,7 @@ const MovieDetailsPage: React.FC = () => {
             {/* Background Images */}
             {movie.background.length > 0 && (
               <Box>
-                <Typography variant="h4" component="h2" color="text.primary" fontWeight="bold" mb={3}>Background Images</Typography>
+                <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>Background Images</Typography>
                 <Grid container spacing={3}>
                   {movie.background.map((bg, index) => (
                     <Grid item xs={12} md={6} lg={4} key={index}>
