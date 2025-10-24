@@ -4,6 +4,7 @@ import MainLayout from '../layouts/MainLayout';
 import { SearchResponse } from '../types';
 import { apiRequest } from '../services/api';
 import { useSearch } from '../context/SearchContext';
+import { Container, Box, Typography, Button, CircularProgress, Grid, Card, CardMedia, CardContent } from '@mui/material';
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -59,15 +60,12 @@ const SearchResultsPage: React.FC = () => {
   if (isLoading) {
     return (
       <MainLayout title={`Search Results for "${query}"`}>
-        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <div className="flex items-center space-x-2">
-            <svg className="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span className="text-white">Loading results...</span>
-          </div>
-        </div>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
+          <Box display="flex" alignItems="center" gap={2}>
+            <CircularProgress size={32} />
+            <Typography variant="body1" color="text.primary">Loading results...</Typography>
+          </Box>
+        </Box>
       </MainLayout>
     );
   }
@@ -75,62 +73,76 @@ const SearchResultsPage: React.FC = () => {
   if (error) {
     return (
       <MainLayout title={`Search Results for "${query}"`}>
-        <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
-          <div className="text-center">
-            <p className="text-red-500 mb-4">{error}</p>
-            <button 
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
+          <Box textAlign="center">
+            <Typography variant="body1" color="error" mb={2}>{error}</Typography>
+            <Button 
               onClick={() => window.location.reload()}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+              variant="contained"
+              color="primary"
             >
               Try Again
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Box>
+        </Box>
       </MainLayout>
     );
   }
 
   return (
     <MainLayout title={`Search Results for "${query}"`}>
-      <div className="container mx-auto px-4 py-8">
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         {searchResults.length === 0 ? (
-          <div className="text-center text-gray-400">
-            No results found for "{query}"
-          </div>
+          <Box textAlign="center" color="text.secondary">
+            <Typography variant="body1">No results found for "{query}"</Typography>
+          </Box>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4">
+          <Grid container spacing={2}>
             {searchResults.map((result) => (
-              <div 
-                key={result.id}
-                onClick={() => handleMovieClick(result.id, result.media_type)}
-                className="bg-gray-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-200 cursor-pointer shadow-lg"
-              >
-                <div className="relative">
-                  <img 
-                    src={result.poster || '/placeholder-movie.svg'} 
+              <Grid item xs={6} sm={4} md={3} lg={2} key={result.id}>
+                <Card 
+                  onClick={() => handleMovieClick(result.id, result.media_type)}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    '&:hover': { transform: 'scale(1.05)' },
+                    backgroundColor: 'background.paper',
+                    boxShadow: 3
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    image={result.poster || '/placeholder-movie.svg'}
                     alt={result.title}
-                    className="w-full aspect-[2/3] object-cover"
+                    sx={{
+                      width: '100%',
+                      aspectRatio: '2/3',
+                      objectFit: 'cover',
+                    }}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = '/placeholder-movie.svg';
                     }}
                   />
-                </div>
-                <div className="p-3 bg-gray-800 border-t border-gray-700">
-                  <h3 className="text-white text-sm font-medium truncate">{result.title}</h3>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-gray-400 text-xs">{result.year || 'N/A'}</span>
-                    <span className="text-yellow-500 text-xs">★ {result.vote}</span>
-                  </div>
-                  <div className="mt-1">
-                    <span className="text-gray-400 text-xs">{result.category}</span>
-                  </div>
-                </div>
-              </div>
+                  <CardContent sx={{ flexGrow: 1, p: 1, backgroundColor: 'grey.800', borderTop: '1px solid', borderColor: 'grey.700' }}>
+                    <Typography variant="subtitle2" color="text.primary" noWrap>{result.title}</Typography>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mt={0.5}>
+                      <Typography variant="caption" color="text.secondary">{result.year || 'N/A'}</Typography>
+                      <Typography variant="caption" color="warning.main">★ {result.vote}</Typography>
+                    </Box>
+                    <Box mt={0.5}>
+                      <Typography variant="caption" color="text.secondary">{result.category}</Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
             ))}
-          </div>
+          </Grid>
         )}
-      </div>
+      </Container>
     </MainLayout>
   );
 };

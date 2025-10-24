@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { LoginCredentials } from '../types';
+import { Container, Box, Typography, TextField, Button, Link } from '@mui/material';
 
 const validationRules = {
   username: {
@@ -55,59 +56,68 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-8 text-white text-center">Welcome Back</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative">
-            <input 
-              type="text" 
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Username"
-              className={`w-full px-4 py-3 bg-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
-                errors.username ? 'border-red-500' : ''
-              }`}
-            />
-            {errors.username && (
-              <p className="mt-1 text-sm text-red-500">{errors.username}</p>
-            )}
-          </div>
-          <div className="relative">
-            <input 
-              type="password" 
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Password"
-              className={`w-full px-4 py-3 bg-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${
-                errors.password ? 'border-red-500' : ''
-              }`}
-            />
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-500">{errors.password}</p>
-            )}
-          </div>
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography component="h1" variant="h5">
+          Welcome Back
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            value={formData.username}
+            onChange={handleChange}
+            error={!!errors.username}
+            helperText={errors.username}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={formData.password}
+            onChange={handleChange}
+            error={!!errors.password}
+            helperText={errors.password}
+          />
           {authError && (
-            <p className="text-sm text-red-500 text-center">{authError}</p>
+            <Typography color="error" variant="body2" align="center" sx={{ mt: 2 }}>
+              {authError}
+            </Typography>
           )}
-          <button 
+          <Button
             type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
             disabled={isLoading || !isValid}
-            className={`w-full bg-blue-500 text-white py-3 rounded-lg text-sm font-medium transition-colors ${
-              (isLoading || !isValid) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
-            }`}
           >
             {isLoading ? 'Logging in...' : 'Login'}
-          </button>
-          <div className="text-center">
-            <a href="#" className="text-blue-500 text-sm hover:text-blue-400">Forgot Password?</a>
-          </div>
-        </form>
-      </div>
-    </div>
+          </Button>
+          <Link href="#" variant="body2">
+            Forgot password?
+          </Link>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 
-export default LoginPage; 
+export default LoginPage;
