@@ -10,6 +10,14 @@ const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const query = searchParams.get('q') || '';
+  const type = searchParams.get('type') || '';
+  const year = searchParams.get('year') || '';
+  const season = searchParams.get('season') || '';
+  const sites = searchParams.get('sites') || '';
+  const quality = searchParams.get('quality') || '';
+  const resolution = searchParams.get('resolution') || '';
+  const promotion = searchParams.get('promotion') || '';
+  const rule = searchParams.get('rule') || '';
   const { searchResults, setSearchResults } = useSearch();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,13 +30,23 @@ const SearchResultsPage: React.FC = () => {
       setError(null);
 
       try {
-        // Using apiRequest from the API service instead of direct fetch
-        const searchParams = {
+        // Build search parameters for advanced search
+        const searchParams: any = {
           type: 'SEARCH',
           subtype: '',
           page: '1',
           keyword: query
         };
+
+        // Add advanced search filters if they exist
+        if (type) searchParams.advanced_type = type;
+        if (year) searchParams.advanced_year = year;
+        if (season) searchParams.advanced_season = season;
+        if (sites) searchParams.advanced_sites = sites;
+        if (quality) searchParams.advanced_quality = quality;
+        if (resolution) searchParams.advanced_resolution = resolution;
+        if (promotion) searchParams.advanced_promotion = promotion;
+        if (rule) searchParams.advanced_rule = rule;
 
         const data = await apiRequest<SearchResponse>('/recommend/list', {
           method: 'POST',
@@ -50,16 +68,19 @@ const SearchResultsPage: React.FC = () => {
     };
 
     fetchResults();
-  }, [query]);
+  }, [query, type, year, season, sites, quality, resolution, promotion, rule]);
 
   const handleMovieClick = (id: number, media_type: string) => {
     const mediaType = media_type === '动漫' || media_type === '电视剧' ? 'TV' : 'MOV';
     navigate(`/movie/${id}?type=${mediaType}`);
   };
 
+  const searchTitle = query || 'Advanced Search';
+  const hasAdvancedFilters = type || year || season || sites || quality || resolution || promotion || rule;
+
   if (isLoading) {
     return (
-      <MainLayout title={`Search Results for "${query}"`}>
+      <MainLayout title={`Search Results for "${searchTitle}"`}>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
           <Box display="flex" alignItems="center" gap={2}>
             <CircularProgress size={32} />
@@ -72,7 +93,7 @@ const SearchResultsPage: React.FC = () => {
 
   if (error) {
     return (
-      <MainLayout title={`Search Results for "${query}"`}>
+      <MainLayout title={`Search Results for "${searchTitle}"`}>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
           <Box textAlign="center">
             <Typography variant="body1" color="error" mb={2}>{error}</Typography>
@@ -90,11 +111,16 @@ const SearchResultsPage: React.FC = () => {
   }
 
   return (
-    <MainLayout title={`Search Results for "${query}"`}>
+    <MainLayout title={`Search Results for "${searchTitle}"`}>
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {searchResults.length === 0 ? (
           <Box textAlign="center" color="text.secondary">
-            <Typography variant="body1">No results found for "{query}"</Typography>
+            <Typography variant="body1">No results found for "{searchTitle}"</Typography>
+            {hasAdvancedFilters && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Try adjusting your search filters or using different keywords.
+              </Typography>
+            )}
           </Box>
         ) : (
           <Grid container spacing={2}>

@@ -10,6 +10,7 @@ import SearchResultsPage from './pages/SearchResultsPage';
 import MovieDetailsPage from './pages/MovieDetailsPage';
 import MovieResourcesPage from './pages/MovieResourcesPage';
 import DownloadsPage from './pages/DownloadsPage';
+import AdvancedSearchPage from './pages/AdvancedSearchPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const AppRoutes: React.FC = () => {
@@ -66,6 +67,16 @@ const AppRoutes: React.FC = () => {
                 <ProtectedRoute>
                   <MainLayout title="Downloads">
                     <DownloadsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/advanced-search"
+              element={
+                <ProtectedRoute>
+                  <MainLayout title="Advanced Search">
+                    <AdvancedSearchPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

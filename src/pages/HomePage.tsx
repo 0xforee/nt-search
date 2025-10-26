@@ -34,6 +34,16 @@ const HomePage: React.FC = () => {
           Search for your favorite movies and TV shows
         </Typography>
         
+        <Box sx={{ mb: 3 }}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate('/advanced-search')}
+            sx={{ mr: 2 }}
+          >
+            高级搜索
+          </Button>
+        </Box>
+        
         <Box component="form" onSubmit={handleSearch} sx={{ width: '100%', maxWidth: 600, mt: 3 }}>
           <TextField
             fullWidth
