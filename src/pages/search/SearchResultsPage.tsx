@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
 import { searchMedia } from '../../services/api';
-import { apiRequest } from '../../services/http-client';
+// import { apiRequest } from '../../services/http-client';
 import { RspSearchItem } from '../../services/api';
 import { useSearch } from '../../context/SearchContext';
-import { Container, Box, Typography, Button, CircularProgress, Grid, Card, CardMedia, CardContent } from '@mui/material';
+import { Container, Box, Typography, Button, CircularProgress, Card, CardMedia, CardContent } from '@mui/material';
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -120,9 +120,9 @@ const SearchResultsPage: React.FC = () => {
             )}
           </Box>
         ) : (
-          <Grid container spacing={2}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(4, 1fr)', lg: 'repeat(6, 1fr)' }, gap: 2 }}>
             {searchResults.map((result) => (
-              <Grid item xs={6} sm={4} md={3} lg={2} key={result.id} component={"div"}>
+              <Box key={result.id}>
                 <Card 
                   onClick={() => handleMovieClick(result.id, result.media_type)}
                   sx={{
@@ -162,9 +162,9 @@ const SearchResultsPage: React.FC = () => {
                     </Box>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         )}
       </Container>
     </MainLayout>

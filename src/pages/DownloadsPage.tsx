@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDownload } from '../context/DownloadContext';
-import { Container, Box, Typography, Button, LinearProgress, List, ListItem, ListItemText, ListItemIcon, IconButton, Pagination } from '@mui/material';
+import { Container, Box, Typography, LinearProgress, List, ListItem, ListItemText, ListItemIcon, IconButton, Pagination } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import CloseIcon from '@mui/icons-material/Close';
@@ -196,7 +196,7 @@ const DownloadsPage: React.FC = () => {
                 <Pagination
                   count={totalHistoryPages}
                   page={historyPage}
-                  onChange={(event, value) => {
+                  onChange={(_, value) => {
                     setHistoryPage(value);
                     fetchDownloadHistory(value);
                   }}

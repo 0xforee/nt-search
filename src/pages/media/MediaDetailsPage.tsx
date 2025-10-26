@@ -9,18 +9,14 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Grid,
   Card,
   CardMedia,
   CardContent,
   Chip,
   Stack,
   Avatar,
-  IconButton,
 } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
-import InfoIcon from '@mui/icons-material/Info';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 const MediaDetailsPage: React.FC = () => {
@@ -133,18 +129,16 @@ const MediaDetailsPage: React.FC = () => {
             <Typography variant="body1" color="text.secondary" lineHeight={1.6} mb={4} sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>{movie.overview}</Typography>
 
             {/* Additional Info */}
-            <Grid container spacing={2} mb={4}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2, mb: 4 }}>
               {movie.fact.map((fact, index) => (
-                <Grid component="div" item xs={12} sm={6} md={4} key={index}>
-                  <Card sx={{ bgcolor: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(5px)', borderRadius: 2, boxShadow: 3 }}>
-                    <CardContent>
-                      <Typography variant="subtitle2" color="text.secondary" mb={1}>{Object.keys(fact)[0]}</Typography>
-                      <Typography variant="body1" color="white">{Object.values(fact)[0]}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card key={index} sx={{ bgcolor: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(5px)', borderRadius: 2, boxShadow: 3 }}>
+                  <CardContent>
+                    <Typography variant="subtitle2" color="text.secondary" mb={1}>{Object.keys(fact)[0]}</Typography>
+                    <Typography variant="body1" color="white">{Object.values(fact)[0]}</Typography>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
 
             {/* View Resources Button */}
             <Button
@@ -184,27 +178,25 @@ const MediaDetailsPage: React.FC = () => {
             {/* Crew Section */}
             <Box mb={6}>
               <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>Crew</Typography>
-              <Grid container spacing={3}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 3 }}>
                 {movie.crews.map((crew, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Card sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3, '&:hover': { bgcolor: 'grey.800' }, transition: 'background-color 0.3s' }}>
-                      <CardContent>
-                        <Typography variant="subtitle1" color="text.primary" mb={1}>{Object.keys(crew)[0]}</Typography>
-                        <Typography variant="body1" color="text.secondary">{Object.values(crew)[0]}</Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                  <Card key={index} sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3, '&:hover': { bgcolor: 'grey.800' }, transition: 'background-color 0.3s' }}>
+                    <CardContent>
+                      <Typography variant="subtitle1" color="text.primary" mb={1}>{Object.keys(crew)[0]}</Typography>
+                      <Typography variant="body1" color="text.secondary">{Object.values(crew)[0]}</Typography>
+                    </CardContent>
+                  </Card>
                 ))}
-              </Grid>
+              </Box>
             </Box>
 
             {/* Background Images */}
             {movie.background.length > 0 && (
               <Box>
                 <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>Background Images</Typography>
-                <Grid container spacing={3}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
                   {movie.background.map((bg, index) => (
-                    <Grid item xs={12} md={6} lg={4} key={index}>
+                    <Box key={index}>
                       <Card sx={{ borderRadius: 2, overflow: 'hidden', boxShadow: 3, '&:hover': { transform: 'scale(1.03)' }, transition: 'transform 0.3s' }}>
                         <CardMedia
                           component="img"
@@ -214,9 +206,9 @@ const MediaDetailsPage: React.FC = () => {
                           sx={{ objectFit: 'cover' }}
                         />
                       </Card>
-                    </Grid>
+                    </Box>
                   ))}
-                </Grid>
+                </Box>
               </Box>
             )}
           </Container>

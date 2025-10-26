@@ -25,7 +25,7 @@ const MultiSelectFilter: React.FC<MultiSelectFilterProps> = ({
   };
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
+    const { value } = event.target;
     if (value === '全部') {
       onChange(event);
     } else {
