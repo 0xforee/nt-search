@@ -9,16 +9,57 @@ interface ApiOptions {
   timeout?: number;
 }
 
-export const API_BASE_URL = 'http://localhost:3000/api/v1';
+const DEFAULT_API_BASE_URL = 'http://localhost:3000/api/v1';
 
-// Create axios instance with default config
-const axiosInstance: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Accept': 'application/json'
-  },
-  timeout: 10000 // 10 seconds timeout
-});
+// Get API base URL from localStorage or use default
+const getApiBaseUrl = (): string => {
+  return localStorage.getItem('api_base_url') || DEFAULT_API_BASE_URL;
+};
+
+// Create axios instance with configurable base URL
+const createAxiosInstance = (): AxiosInstance => {
+  return axios.create({
+    baseURL: getApiBaseUrl(),
+    headers: {
+      'Accept': 'application/json'
+    },
+    timeout: 10000 // 10 seconds timeout
+  });
+};
+
+let axiosInstance: AxiosInstance = createAxiosInstance();
+
+// Function to update the axios instance with new base URL
+export const updateApiBaseUrl = (newBaseUrl: string): void => {
+  localStorage.setItem('api_base_url', newBaseUrl);
+  axiosInstance = createAxiosInstance();
+  
+  // Re-add interceptors to the new instance
+  axiosInstance.interceptors.request.use(
+    (config) => {
+      // Get auth token from localStorage
+      const token = localStorage.getItem('auth_token');
+      
+      // Add auth header if token exists
+      if (token && config.headers) {
+        config.headers['Authorization'] = token;
+      }
+      
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
+
+  axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      const errorMessage = error.response?.data?.error || `API request failed with status ${error.response?.status || 'unknown'}`;
+      return Promise.reject(new Error(errorMessage));
+    }
+  );
+};
 
 // Request interceptor for adding auth token
 axiosInstance.interceptors.request.use(

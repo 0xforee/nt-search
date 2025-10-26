@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { DownloadProvider } from './context/DownloadContext';
 import { SearchProvider } from './context/SearchContext';
+import { ApiConfigProvider } from './context/ApiConfigContext';
 import MainLayout from './layouts/MainLayout';
 import LoginPage from './pages/login/LoginPage';
 import HomePage from './pages/home/HomePage';
@@ -16,10 +17,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 const AppRoutes: React.FC = () => {
   return (
     <Router>
-      <AuthProvider>
-        <DownloadProvider>
-          <SearchProvider>
-          <Routes>
+      <ApiConfigProvider>
+        <AuthProvider>
+          <DownloadProvider>
+            <SearchProvider>
+            <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route
               path="/"
@@ -82,10 +84,11 @@ const AppRoutes: React.FC = () => {
               }
             />
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-          </SearchProvider>
-        </DownloadProvider>
-      </AuthProvider>
+            </Routes>
+            </SearchProvider>
+          </DownloadProvider>
+        </AuthProvider>
+      </ApiConfigProvider>
     </Router>
   );
 };

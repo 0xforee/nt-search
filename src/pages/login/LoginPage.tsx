@@ -2,10 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
+import { updateApiBaseUrl } from '../../services/http-client';
 import { LoginCredentials } from '../../types';
 import { Container, Box, Typography, TextField, Button, Link } from '@mui/material';
 
 const validationRules = {
+  apiBaseUrl: {
+    required: true,
+    pattern: /^https?:\/\/.+/,
+    message: 'Valid API Base URL is required (e.g., http://localhost:3000/api/v1)',
+  },
   username: {
     required: true,
     minLength: 3,
@@ -27,13 +33,31 @@ const LoginPage: React.FC = () => {
     username: '',
     password: '',
   });
+  const [apiBaseUrl, setApiBaseUrl] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'apiBaseUrl') {
+      setApiBaseUrl(value);
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
     // Validate on change
-    validateForm({ ...formData, [name]: value });
+    const validationData = name === 'apiBaseUrl' 
+      ? { ...formData, apiBaseUrl: value }
+      : { ...formData, [name]: value };
+    validateForm(validationData);
   };
+
+  useEffect(() => {
+    // Load saved API base URL from localStorage
+    const savedApiUrl = localStorage.getItem('api_base_url');
+    if (savedApiUrl) {
+      setApiBaseUrl(savedApiUrl);
+    } else {
+      setApiBaseUrl('http://localhost:3000/api/v1');
+    }
+  }, []);
 
   useEffect(() => {
     // Log validation state whenever it changes
@@ -43,9 +67,14 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm(formData)) {
+    // Validate all fields including API base URL
+    const validationData = { ...formData, apiBaseUrl };
+    if (!validateForm(validationData)) {
       return;
     }
+
+    // Save API base URL before login
+    updateApiBaseUrl(apiBaseUrl.trim());
 
     try {
       await login(formData);
@@ -73,11 +102,24 @@ const LoginPage: React.FC = () => {
             margin="normal"
             required
             fullWidth
+            id="apiBaseUrl"
+            label="API Base URL"
+            name="apiBaseUrl"
+            placeholder="http://localhost:3000/api/v1"
+            value={apiBaseUrl}
+            onChange={handleChange}
+            error={!!errors.apiBaseUrl}
+            helperText={errors.apiBaseUrl || "Enter the base URL for the API server"}
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
             id="username"
             label="Username"
             name="username"
             autoComplete="username"
-            autoFocus
             value={formData.username}
             onChange={handleChange}
             error={!!errors.username}
