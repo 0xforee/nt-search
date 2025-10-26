@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDownload } from '../context/DownloadContext';
 import { useAuth } from '../context/AuthContext';
-import { AppBar, Toolbar, IconButton, Typography, Box, Container, Menu, MenuItem, Fab, Badge } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Box, Container, Menu, MenuItem, Fab, Badge, useTheme } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -16,6 +16,7 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
   const { activeDownloads } = useDownload();
   const { logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -93,7 +94,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         </Toolbar>
       </AppBar>
 
-      <Box component="main" sx={{ flexGrow: 1, pt: 2, pb: 4 }}>
+      <Box component="main" sx={{ flexGrow: 1, pt: `${theme.mixins.toolbar.minHeight}px`, pb: 4 }}>
         {children}
       </Box>
 

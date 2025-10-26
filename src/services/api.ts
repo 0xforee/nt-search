@@ -39,7 +39,8 @@ async function searchTorrentsAsync(keyword: string) : Promise<ApiResponse<any>>{
     const response = await apiRequest<ApiResponse<any>>('/search/keyword', {
         method: 'POST',
         urlEncoded: true,
-        body: { search_word: keyword }
+        body: { search_word: keyword },
+        timeout: 30000
       });
       return response;
 }

@@ -179,7 +179,7 @@ const MediaResourcesPage: React.FC = () => {
 
   return (
     <MainLayout title={`Resources for "${movie.title}"`}>
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <Container maxWidth="md">
         {/* Movie Header */}
         <Box sx={{ position: 'relative', mb: 4 }}>
           <Card>

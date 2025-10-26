@@ -109,7 +109,7 @@ const SearchResultsPage: React.FC = () => {
 
   return (
     <MainLayout title={`Search Results for "${searchTitle}"`}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg">
         {searchResults.length === 0 ? (
           <Box textAlign="center" color="text.secondary">
             <Typography variant="body1">No results found for "{searchTitle}"</Typography>
