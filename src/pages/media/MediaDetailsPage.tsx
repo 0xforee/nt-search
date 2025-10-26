@@ -135,7 +135,7 @@ const MediaDetailsPage: React.FC = () => {
             {/* Additional Info */}
             <Grid container spacing={2} mb={4}>
               {movie.fact.map((fact, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
+                <Grid component="div" item xs={12} sm={6} md={4} key={index}>
                   <Card sx={{ bgcolor: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(5px)', borderRadius: 2, boxShadow: 3 }}>
                     <CardContent>
                       <Typography variant="subtitle2" color="text.secondary" mb={1}>{Object.keys(fact)[0]}</Typography>

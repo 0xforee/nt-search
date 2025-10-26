@@ -3,8 +3,8 @@ import { useParams, useNavigate, useSearchParams, useLocation } from 'react-rout
 import { useDownload } from '../../context/DownloadContext';
 import { useSearch } from '../../context/SearchContext';
 import MainLayout from '../../layouts/MainLayout';
-import { apiRequest } from '../../services/http-client';
-import { MovieData, TorrentResource } from '../../types';
+import { searchTorrentsAsync, getSearchTorrents, TorrentInfo } from '../../services/api';
+import { MovieData } from '../../types';
 import {
   Box,
   Typography,
@@ -19,29 +19,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  IconButton,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-interface SearchKeywordResponse {
-  code: number;
-  success: boolean;
-  message: string;
-  data: any;
-}
-
-interface SearchResultResponse {
-  code: number;
-  success: boolean;
-  message: string;
-  data: {
-    total: number;
-    result: {
-      [key: string]: MovieData;
-    }
-  }
-}
 
 
 
@@ -52,23 +33,14 @@ const MediaResourcesPage: React.FC = () => {
   const location = useLocation();
   const { startDownload } = useDownload();
   const [movie, setMovie] = useState<MovieData | null>(null);
-  const {movieResources, setMovieResources } = useSearch();
-  const [resources, setResources] = useState<TorrentResource[]>([]);
+  const { setMovieResources } = useSearch();
+  const [resources, setResources] = useState<TorrentInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMovieResources = async () => {
       if (!id) return;
-
-      // Check if we already have the movie data in context
-      if (movieResources[id]) {
-        setMovie(movieResources[id]);
-        const torrents = extractTorrents(movieResources[id].torrent_dict);
-        setResources(torrents);
-        setIsLoading(false);
-        return;
-      }
 
       setIsLoading(true);
       setError(null);
@@ -89,12 +61,44 @@ const MediaResourcesPage: React.FC = () => {
           throw new Error('Movie ID is required or movie data not found');
         }
         
-        // Set the movie data and extract torrents
+        // Set the movie data
         setMovieResources(id, currentMovie);
         setMovie(currentMovie);
 
-        const torrents = extractTorrents(currentMovie.torrent_dict);
-        setResources(torrents);
+        // Extract search keyword from movie title
+        const keyword = currentMovie.title;
+
+        // Trigger torrent search using the movie title
+        await searchTorrentsAsync(keyword);
+        
+        // Get search results
+        const searchResults = await getSearchTorrents();
+        
+        if (searchResults.success && searchResults.data) {
+          // Extract torrents from the search results
+          const torrents: TorrentInfo[] = [];
+          Object.values(searchResults.data.result).forEach((movieData) => {
+            if (movieData.torrent_dict) {
+              movieData.torrent_dict.forEach((entry) => {
+                if (Array.isArray(entry) && entry.length > 1) {
+                  const [_, categories] = entry;
+                  Object.values(categories).forEach((category) => {
+                    if (category.group_torrents) {
+                      Object.values(category.group_torrents).forEach((group) => {
+                        if (group.torrent_list) {
+                          torrents.push(...group.torrent_list);
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
+          setResources(torrents);
+        } else {
+          setError('No torrents found for this movie');
+        }
         
       } catch (err) {
         setError('Failed to load resources. Please try again.');
@@ -107,57 +111,8 @@ const MediaResourcesPage: React.FC = () => {
     fetchMovieResources();
   }, [id, searchParams, location.state]);
 
-  const extractTorrents = (torrentDict: any): TorrentResource[] => {
-    const torrents: TorrentResource[] = [];
-    
-    if (Array.isArray(torrentDict)) {
-      // Format: [['MOV', {...}]]
-      torrentDict.forEach((item: any) => {
-        if (Array.isArray(item) && item.length > 1) {
-          const [resolutions] = item;
-          
-          // Iterate through each resolution type (1080p_bluray, 2160p_, etc.)
-          Object.values(resolutions).forEach((resolution: any) => {
-            // Check if group_torrents exists
-            if (resolution.group_torrents) {
-              // Iterate through each group in group_torrents
-              Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
-                // Extract torrents from torrent_list
-                if (torrentGroup.torrent_list && Array.isArray(torrentGroup.torrent_list)) {
-                  torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
-                    torrents.push(torrent);
-                  });
-                }
-              });
-            }
-          });
-        }
-      });
-    } else {
-      // Alternative structure handling
-      Object.entries(torrentDict).forEach(([_, typeData]: [string, any]) => {
-        if (Array.isArray(typeData)) {
-          typeData.forEach((item: any) => {
-            if (Array.isArray(item) && item.length > 1) {
-              const [_, resolutions] = item;
-              
-              Object.values(resolutions).forEach((resolution: any) => {
-                Object.values(resolution.group_torrents).forEach((torrentGroup: any) => {
-                  torrentGroup.torrent_list.forEach((torrent: TorrentResource) => {
-                    torrents.push(torrent);
-                  });
-                });
-              });
-            }
-          });
-        }
-      });
-    }
-  
-    return torrents;
-  };
 
-  const handleDownload = async (resource: TorrentResource) => {
+  const handleDownload = async (resource: TorrentInfo) => {
     try {
       // Show loading state
       setIsLoading(true);
@@ -340,6 +295,7 @@ const MediaResourcesPage: React.FC = () => {
                           <Chip label={resource.video_encode} size="small" />
                           <Chip label={resource.size} size="small" />
                           <Chip label={`${resource.seeders} seeders`} size="small" />
+                          <Chip label={resource.site} size="small" />
                         </Stack>
                       </Box>
                     }

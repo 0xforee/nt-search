@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState } from 'react';
-import { SearchItem } from '../types';
+import { RspSearchItem } from '../services/api';
 import { MovieData } from '../types';
 
 interface SearchContextType {
-  searchResults: SearchItem[];
-  setSearchResults: (results: SearchItem[]) => void;
+  searchResults: RspSearchItem[];
+  setSearchResults: (results: RspSearchItem[]) => void;
   movieResources: Record<string, MovieData>;
   setMovieResources: (movieId: string, data: MovieData) => void;
   clearSearchResults: () => void;
@@ -22,7 +22,7 @@ export const useSearch = () => {
 };
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [searchResults, setSearchResults] = useState<SearchItem[]>([]);
+  const [searchResults, setSearchResults] = useState<RspSearchItem[]>([]);
   const [movieResources, setMovieResourcesState] = useState<Record<string, MovieData>>({});
 
   const setMovieResources = (movieId: string, data: MovieData) => {

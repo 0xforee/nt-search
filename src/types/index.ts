@@ -111,18 +111,6 @@ export interface Download {
   filePath?: string;
 }
 
-// API response types
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-export interface PaginatedResponse<T> extends ApiResponse<T> {
-  page: number;
-  totalPages: number;
-  totalResults: number;
-}
 
 // Search related types
 export interface SearchParams {
@@ -150,29 +138,6 @@ export interface ModalProps {
   children: React.ReactNode;
 }
 
-export interface SearchItem {
-  id: number;
-  title: string;
-  year: string | null;
-  type: string;
-  media_type: string;
-  vote: number;
-  image: string;
-  overview: string;
-  poster: string;
-  category: string;
-  original_title: string;
-  release_date: string;
-}
-
-export interface SearchResponse {
-  code: number;
-  success: boolean;
-  message: string;
-  data: {
-    Items: SearchItem[];
-  };
-}
 
 export interface MovieFact {
   [key: string]: string;

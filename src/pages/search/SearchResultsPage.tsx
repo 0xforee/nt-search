@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
-import { SearchResponse } from '../../types';
+import { searchMedia } from '../../services/api';
 import { apiRequest } from '../../services/http-client';
+import { RspSearchItem } from '../../services/api';
 import { useSearch } from '../../context/SearchContext';
 import { Container, Box, Typography, Button, CircularProgress, Grid, Card, CardMedia, CardContent } from '@mui/material';
 
@@ -48,17 +49,13 @@ const SearchResultsPage: React.FC = () => {
         if (promotion) searchParams.advanced_promotion = promotion;
         if (rule) searchParams.advanced_rule = rule;
 
-        const data = await apiRequest<SearchResponse>('/recommend/list', {
-          method: 'POST',
-          urlEncoded: true,
-          body: searchParams
-        });
-        
+
+        const data = await searchMedia(searchParams);
         if (!data.success) {
           throw new Error(data.message || 'Search failed');
         }
 
-        setSearchResults(data.data.Items);
+        setSearchResults(data.data.Items as RspSearchItem[]);
       } catch (err) {
         setError('Failed to fetch search results. Please try again.');
         console.error('Search error:', err);
