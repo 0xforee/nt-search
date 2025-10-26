@@ -1,0 +1,195 @@
+name: Release Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    name: Create Release
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            version="${{ github.event.inputs.version }}"
+          else
+            version=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=${version}" >> $GITHUB_OUTPUT
+          echo "app_version=${version}" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: Release ${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+
+  build-alpine:
+    runs-on: ubuntu-latest
+    name: Build Alpine Image
+    needs: create-release
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/nt-search
+          tags: |
+            type=raw,value=${{ needs.create-release.outputs.version }}
+            type=raw,value=latest
+            type=raw,value=alpine
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Alpine image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-debian:
+    runs-on: ubuntu-latest
+    name: Build Debian Image
+    needs: create-release
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/nt-search
+          tags: |
+            type=raw,value=${{ needs.create-release.outputs.version }}-debian
+            type=raw,value=debian
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Debian image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.debian
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Scan
+    needs: [build-alpine, build-debian]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner (Alpine)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/nt-search:${{ needs.create-release.outputs.version }}
+          format: 'sarif'
+          output: 'trivy-results-alpine.sarif'
+
+      - name: Run Trivy vulnerability scanner (Debian)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/nt-search:${{ needs.create-release.outputs.version }}-debian
+          format: 'sarif'
+          output: 'trivy-results-debian.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results-alpine.sarif,trivy-results-debian.sarif'
+
+  notify:
+    runs-on: ubuntu-latest
+    name: Notify Release
+    needs: [build-alpine, build-debian, security-scan]
+    if: always()
+    
+    steps:
+      - name: Notify success
+        if: needs.build-alpine.result == 'success' && needs.build-debian.result == 'success'
+        run: |
+          echo "✅ Release ${{ needs.create-release.outputs.version }} published successfully!"
+          echo "🐳 Alpine image: ${{ secrets.DOCKER_USERNAME }}/nt-search:${{ needs.create-release.outputs.version }}"
+          echo "🐳 Debian image: ${{ secrets.DOCKER_USERNAME }}/nt-search:${{ needs.create-release.outputs.version }}-debian"
+
+      - name: Notify failure
+        if: needs.build-alpine.result == 'failure' || needs.build-debian.result == 'failure'
+        run: |
+          echo "❌ Release ${{ needs.create-release.outputs.version }} failed!"
+          exit 1

@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # Frontend React App
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nt-search-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - nt-search-network
+
+  # Backend API (if you have one)
+  backend:
+    image: node:18-alpine
+    container_name: nt-search-backend
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    working_dir: /app
+    command: sh -c "npm install && npm start"
+    restart: unless-stopped
+    networks:
+      - nt-search-network
+    profiles:
+      - backend
+
+  # Database (if needed)
+  database:
+    image: postgres:15-alpine
+    container_name: nt-search-database
+    environment:
+      - POSTGRES_DB=ntsearch
+      - POSTGRES_USER=ntsearch
+      - POSTGRES_PASSWORD=ntsearch123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - nt-search-network
+    profiles:
+      - database
+
+  # Redis (if needed for caching)
+  redis:
+    image: redis:7-alpine
+    container_name: nt-search-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - nt-search-network
+    profiles:
+      - redis
+
+networks:
+  nt-search-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
