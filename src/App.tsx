@@ -4,13 +4,13 @@ import { AuthProvider } from './context/AuthContext';
 import { DownloadProvider } from './context/DownloadContext';
 import { SearchProvider } from './context/SearchContext';
 import MainLayout from './layouts/MainLayout';
-import LoginPage from './pages/LoginPage';
-import HomePage from './pages/HomePage';
-import SearchResultsPage from './pages/SearchResultsPage';
-import MovieDetailsPage from './pages/MovieDetailsPage';
-import MovieResourcesPage from './pages/MovieResourcesPage';
+import LoginPage from './pages/login/LoginPage';
+import HomePage from './pages/home/HomePage';
+import SearchResultsPage from './pages/search/SearchResultsPage';
+import MediaDetailsPage from './pages/media/MediaDetailsPage';
+import MediaResourcesPage from './pages/media/MediaResourcesPage';
 import DownloadsPage from './pages/DownloadsPage';
-import AdvancedSearchPage from './pages/AdvancedSearchPage';
+import AdvancedSearchPage from './pages/search/AdvancedSearchPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const AppRoutes: React.FC = () => {
@@ -42,21 +42,21 @@ const AppRoutes: React.FC = () => {
               }
             />
             <Route
-              path="/movie/:id"
+              path="/media/:id"
               element={
                 <ProtectedRoute>
-                  <MainLayout title="Movie Details">
-                    <MovieDetailsPage />
+                  <MainLayout title="Media Details">
+                    <MediaDetailsPage />
                   </MainLayout>
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/movie/:id/resources"
+              path="/media/:id/resources"
               element={
                 <ProtectedRoute>
-                  <MainLayout title="Movie Resources">
-                    <MovieResourcesPage />
+                  <MainLayout title="Media Resources">
+                    <MediaResourcesPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

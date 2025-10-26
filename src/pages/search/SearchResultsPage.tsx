@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
-import { SearchResponse } from '../types';
-import { apiRequest } from '../services/api';
-import { useSearch } from '../context/SearchContext';
+import MainLayout from '../../layouts/MainLayout';
+import { SearchResponse } from '../../types';
+import { apiRequest } from '../../services/http-client';
+import { useSearch } from '../../context/SearchContext';
 import { Container, Box, Typography, Button, CircularProgress, Grid, Card, CardMedia, CardContent } from '@mui/material';
 
 const SearchResultsPage: React.FC = () => {
@@ -72,7 +72,7 @@ const SearchResultsPage: React.FC = () => {
 
   const handleMovieClick = (id: number, media_type: string) => {
     const mediaType = media_type === '动漫' || media_type === '电视剧' ? 'TV' : 'MOV';
-    navigate(`/movie/${id}?type=${mediaType}`);
+    navigate(`/media/${id}?type=${mediaType}`);
   };
 
   const searchTitle = query || 'Advanced Search';

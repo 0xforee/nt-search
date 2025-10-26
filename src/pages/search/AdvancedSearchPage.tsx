@@ -9,7 +9,7 @@ import {
   Paper,
   CircularProgress
 } from '@mui/material';
-import MultiSelectFilter from '../components/MultiSelectFilter';
+import MultiSelectFilter from '../../components/MultiSelectFilter';
 
 interface FilterState {
   type: string[];

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
-import { MovieDetails, MovieDetailsResponse } from '../types';
-import { apiRequest } from '../services/api';
+import MainLayout from '../../layouts/MainLayout';
+import { MovieDetails, MovieDetailsResponse } from '../../types';
+import { apiRequest } from '../../services/http-client';
 import {
   Container,
   Box,
@@ -23,7 +23,7 @@ import StarIcon from '@mui/icons-material/Star';
 import InfoIcon from '@mui/icons-material/Info';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
-const MovieDetailsPage: React.FC = () => {
+const MediaDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -152,7 +152,7 @@ const MovieDetailsPage: React.FC = () => {
               color="primary"
               size="large"
               startIcon={<PlayArrowIcon />}
-              onClick={() => navigate(`/movie/${id}/resources?type=${searchParams.get('type') || 'MOV'}`, { state: { movie } })}
+              onClick={() => navigate(`/media/${id}/resources?type=${searchParams.get('type') || 'MOV'}`, { state: { movie } })}
               sx={{ mt: 2, py: 2, px: 4, fontSize: '1rem' }}
             >
               View Resources
@@ -226,4 +226,4 @@ const MovieDetailsPage: React.FC = () => {
   );
 };
 
-export default MovieDetailsPage;
+export default MediaDetailsPage;

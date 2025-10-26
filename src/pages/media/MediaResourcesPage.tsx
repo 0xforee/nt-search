@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { useDownload } from '../context/DownloadContext';
-import { useSearch } from '../context/SearchContext';
-import MainLayout from '../layouts/MainLayout';
-import { apiRequest } from '../services/api';
-import { MovieData, TorrentResource } from '../types';
+import { useDownload } from '../../context/DownloadContext';
+import { useSearch } from '../../context/SearchContext';
+import MainLayout from '../../layouts/MainLayout';
+import { apiRequest } from '../../services/http-client';
+import { MovieData, TorrentResource } from '../../types';
 import {
   Box,
   Typography,
@@ -45,7 +45,7 @@ interface SearchResultResponse {
 
 
 
-const MovieResourcesPage: React.FC = () => {
+const MediaResourcesPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -364,4 +364,4 @@ const MovieResourcesPage: React.FC = () => {
   );
 };
 
-export default MovieResourcesPage;
+export default MediaResourcesPage;

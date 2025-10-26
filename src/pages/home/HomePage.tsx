@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { Container, Box, Typography, TextField, Button, CircularProgress } from '@mui/material';
 
 const HomePage: React.FC = () => {

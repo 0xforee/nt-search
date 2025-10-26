@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useFormValidation } from '../hooks/useFormValidation';
-import { LoginCredentials } from '../types';
+import { useAuth } from '../../context/AuthContext';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { LoginCredentials } from '../../types';
 import { Container, Box, Typography, TextField, Button, Link } from '@mui/material';
 
 const validationRules = {
