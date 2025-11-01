@@ -23,24 +23,29 @@ export const useFormValidation = (rules: ValidationRules) => {
     const fieldRules = rules[name];
     if (!fieldRules) return '';
 
-    if (fieldRules.required && !value) {
+    // For string values, trim whitespace for validation (but only for checking, not for display)
+    const stringValue = typeof value === 'string' ? value.trim() : value;
+    const isEmpty = stringValue === '' || stringValue == null || stringValue === undefined;
+
+    if (fieldRules.required && isEmpty) {
       return fieldRules.message;
     }
 
-    if (value) {
-      if (fieldRules.minLength && value.length < fieldRules.minLength) {
+    // Only validate pattern, length, etc. if value exists
+    if (!isEmpty && stringValue) {
+      if (fieldRules.minLength && stringValue.length < fieldRules.minLength) {
         return `${fieldRules.message} (minimum ${fieldRules.minLength} characters)`;
       }
 
-      if (fieldRules.maxLength && value.length > fieldRules.maxLength) {
+      if (fieldRules.maxLength && stringValue.length > fieldRules.maxLength) {
         return `${fieldRules.message} (maximum ${fieldRules.maxLength} characters)`;
       }
 
-      if (fieldRules.pattern && !fieldRules.pattern.test(value)) {
+      if (fieldRules.pattern && !fieldRules.pattern.test(stringValue)) {
         return fieldRules.message;
       }
 
-      if (fieldRules.custom && !fieldRules.custom(value)) {
+      if (fieldRules.custom && !fieldRules.custom(stringValue)) {
         return fieldRules.message;
       }
     }

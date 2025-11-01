@@ -42,10 +42,10 @@ const LoginPage: React.FC = () => {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
-    // Validate on change
+    // Validate on change - always include all fields including apiBaseUrl
     const validationData = name === 'apiBaseUrl' 
       ? { ...formData, apiBaseUrl: value }
-      : { ...formData, [name]: value };
+      : { ...formData, apiBaseUrl, [name]: value };
     validateForm(validationData);
   };
 
@@ -54,27 +54,36 @@ const LoginPage: React.FC = () => {
     const savedApiUrl = localStorage.getItem('api_base_url');
     if (savedApiUrl) {
       setApiBaseUrl(savedApiUrl);
+      // Validate initial value - validation hook will automatically trim
+      const validationData = { username: '', password: '', apiBaseUrl: savedApiUrl };
+      validateForm(validationData);
     } else {
-      setApiBaseUrl('http://localhost:3000/api/v1');
+      const defaultUrl = 'http://localhost:3000/api/v1';
+      setApiBaseUrl(defaultUrl);
+      // Validate default value
+      const validationData = { username: '', password: '', apiBaseUrl: defaultUrl };
+      validateForm(validationData);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     // Log validation state whenever it changes
-    console.log('Form validation state:', { isValid, errors, formData });
-  }, [isValid, errors, formData]);
+    console.log('Form validation state:', { isValid, errors, formData, apiBaseUrl });
+  }, [isValid, errors, formData, apiBaseUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all fields including API base URL
-    const validationData = { ...formData, apiBaseUrl };
+    // Validate all fields including API base URL - trim apiBaseUrl for validation
+    const trimmedApiBaseUrl = apiBaseUrl.trim();
+    const validationData = { ...formData, apiBaseUrl: trimmedApiBaseUrl };
     if (!validateForm(validationData)) {
       return;
     }
 
     // Save API base URL before login
-    updateApiBaseUrl(apiBaseUrl.trim());
+    updateApiBaseUrl(trimmedApiBaseUrl);
 
     try {
       await login(formData);
