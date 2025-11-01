@@ -5,7 +5,7 @@ import { useSearch } from '../../context/SearchContext';
 import MainLayout from '../../layouts/MainLayout';
 import { searchTorrentsAsync, getSearchTorrents, TorrentInfo } from '../../services/api';
 import { MovieData } from '../../types';
-import { processMovieResources, ProcessedMovieResources, GroupedResources } from '../../utils/movieUtils';
+import { processMovieResources, ProcessedMovieResources, GroupedResources, findRecommendedResource } from '../../utils/movieUtils';
 import { processTVResources } from '../../utils/tvUtils';
 import {
   Box,
@@ -40,6 +40,7 @@ const MediaResourcesPage: React.FC = () => {
   const [resources, setResources] = useState<TorrentInfo[]>([]);
   const [processedResources, setProcessedResources] = useState<ProcessedMovieResources | null>(null);
   const [selectedTab, setSelectedTab] = useState<keyof GroupedResources>('4k');
+  const [recommendedResource, setRecommendedResource] = useState<TorrentInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,6 +81,10 @@ const MediaResourcesPage: React.FC = () => {
         const searchResults = await getSearchTorrents();
         
         if (searchResults.success && searchResults.data) {
+          // Find recommended resource
+          const recommended = findRecommendedResource(searchResults);
+          setRecommendedResource(recommended);
+          
           // Determine if it's a movie or TV show by checking type_key from search results
           // Get the first result to check type_key (MovieTorrentResource)
           const firstResult = Object.values(searchResults.data.result)[0];
@@ -265,6 +270,113 @@ const MediaResourcesPage: React.FC = () => {
           <Typography variant="h6" component="h2" mb={2}>
             Available Resources
           </Typography>
+
+          {/* Recommended Resource */}
+          {recommendedResource && (
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="subtitle2" color="primary" fontWeight="bold" mb={1.5}>
+                ⭐ 推荐资源
+              </Typography>
+              <Card
+                sx={{
+                  bgcolor: 'primary.light',
+                  background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(25, 118, 210, 0.05) 100%)',
+                  border: '2px solid',
+                  borderColor: 'primary.main',
+                  borderRadius: 2,
+                  boxShadow: 3,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' },
+                    justifyContent: 'space-between',
+                    p: 2.5,
+                  }}
+                >
+                  <Box sx={{ flexGrow: 1, mb: { xs: 2, sm: 0 }, minWidth: 0 }}>
+                    <Typography
+                      variant="subtitle1"
+                      component="div"
+                      fontWeight="bold"
+                      gutterBottom
+                      sx={{
+                        wordBreak: 'break-word',
+                        overflowWrap: 'break-word',
+                        maxWidth: { sm: '60ch' },
+                      }}
+                    >
+                      {recommendedResource.torrent_name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      component="div"
+                      sx={{ mt: 0.5, mb: 1.5 }}
+                    >
+                      {recommendedResource.description}
+                    </Typography>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      flexWrap="wrap"
+                    >
+                      <Chip
+                        label={recommendedResource.video_encode}
+                        size="small"
+                        color="primary"
+                        sx={{ fontWeight: 'bold' }}
+                      />
+                      <Chip
+                        label={recommendedResource.size}
+                        size="small"
+                        color="secondary"
+                        sx={{ fontWeight: 'bold' }}
+                      />
+                      <Chip
+                        label={`${recommendedResource.seeders} seeders`}
+                        size="small"
+                        color={recommendedResource.seeders > 0 ? 'success' : 'default'}
+                        sx={{ fontWeight: 'bold' }}
+                      />
+                      {recommendedResource.releasegroup && (
+                        <Chip
+                          label={recommendedResource.releasegroup}
+                          size="small"
+                          color="info"
+                          sx={{ fontWeight: 'bold' }}
+                        />
+                      )}
+                      <Chip
+                        label={recommendedResource.site}
+                        size="small"
+                        color="info"
+                        sx={{ fontWeight: 'bold' }}
+                      />
+                    </Stack>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    startIcon={<DownloadIcon />}
+                    onClick={() => handleDownload(recommendedResource)}
+                    sx={{
+                      ml: { sm: 2 },
+                      minWidth: '120px',
+                      flexShrink: 0,
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    Download
+                  </Button>
+                </Box>
+              </Card>
+            </Box>
+          )}
 
           {/* Movie: Show tabs for grouped resources */}
           {processedResources ? (

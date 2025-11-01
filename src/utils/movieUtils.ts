@@ -171,3 +171,189 @@ export function processMovieResources(
   };
 }
 
+/**
+ * Check if resolution is 4k or 1080p
+ */
+function isHighQualityResolution(respix: string): boolean {
+  const normalized = respix.toLowerCase().trim();
+  return (
+    normalized.includes('2160p') ||
+    normalized.includes('4k') ||
+    normalized.includes('uhd') ||
+    normalized.includes('1080p')
+  );
+}
+
+/**
+ * Check if resolution is 1080p
+ */
+function is1080pResolution(respix: string): boolean {
+  const normalized = respix.toLowerCase().trim();
+  return normalized.includes('1080p');
+}
+
+/**
+ * Get resolution priority for sorting (higher number = higher priority)
+ */
+function getResolutionPriority(respix: string): number {
+  const normalized = respix.toLowerCase().trim();
+  if (normalized.includes('2160p') || normalized.includes('4k') || normalized.includes('uhd')) {
+    return 4; // 4k is highest
+  }
+  if (normalized.includes('1080p')) {
+    return 3; // 1080p is second
+  }
+  if (normalized.includes('1440p') || normalized.includes('2k')) {
+    return 2; // 2k is third
+  }
+  return 1; // other is lowest
+}
+
+/**
+ * Sort torrents by resolution (descending) and then by seeders (descending)
+ */
+function sortByResolutionAndSeeders(torrents: TorrentInfo[]): TorrentInfo[] {
+  return [...torrents].sort((a, b) => {
+    const resolutionA = getResolutionPriority(a.respix || 'other');
+    const resolutionB = getResolutionPriority(b.respix || 'other');
+    
+    // First sort by resolution (descending)
+    if (resolutionA !== resolutionB) {
+      return resolutionB - resolutionA;
+    }
+    
+    // Then sort by seeders (descending)
+    return b.seeders - a.seeders;
+  });
+}
+
+/**
+ * Find recommended resource with fallback strategy
+ */
+export function findRecommendedResource(
+  searchResults: MediaTorrentsAPIResponse
+): TorrentInfo | null {
+  // Extract all torrents from the search results
+  const allTorrents: TorrentInfo[] = [];
+
+  if (searchResults.success && searchResults.data) {
+    Object.values(searchResults.data.result).forEach((movieData) => {
+      if (movieData.torrent_dict) {
+        movieData.torrent_dict.forEach((entry) => {
+          if (Array.isArray(entry) && entry.length > 1) {
+            const [_, categories] = entry;
+            Object.values(categories).forEach((category) => {
+              if (category.group_torrents) {
+                Object.values(category.group_torrents).forEach((group) => {
+                  if (group.torrent_list) {
+                    allTorrents.push(...group.torrent_list);
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  if (allTorrents.length === 0) {
+    return null;
+  }
+
+  // Merge duplicate resources
+  const mergedTorrents = mergeDuplicateResources(allTorrents);
+
+  // Try different priority levels
+  const priorityFilters = [
+    // Priority 1: releasegroup != null AND (4k OR 1080p) AND seeders > 10
+    (t: TorrentInfo) =>
+      t.releasegroup != null &&
+      t.releasegroup.trim() !== '' &&
+      isHighQualityResolution(t.respix || '') &&
+      t.seeders > 10,
+    
+    // Priority 2: releasegroup != null AND (4k OR 1080p) AND seeders > 0
+    (t: TorrentInfo) =>
+      t.releasegroup != null &&
+      t.releasegroup.trim() !== '' &&
+      isHighQualityResolution(t.respix || '') &&
+      t.seeders > 0,
+    
+    // Priority 3: releasegroup != null AND (4k OR 1080p) AND seeders >= 0
+    (t: TorrentInfo) =>
+      t.releasegroup != null &&
+      t.releasegroup.trim() !== '' &&
+      isHighQualityResolution(t.respix || ''),
+    
+    // Priority 4: releasegroup != null AND 1080p AND seeders > 10
+    (t: TorrentInfo) =>
+      t.releasegroup != null &&
+      t.releasegroup.trim() !== '' &&
+      is1080pResolution(t.respix || '') &&
+      t.seeders > 10,
+    
+    // Priority 5: releasegroup != null AND 1080p AND seeders > 0
+    (t: TorrentInfo) =>
+      t.releasegroup != null &&
+      t.releasegroup.trim() !== '' &&
+      is1080pResolution(t.respix || '') &&
+      t.seeders > 0,
+    
+    // Priority 6: releasegroup != null AND 1080p AND seeders >= 0
+    (t: TorrentInfo) =>
+      t.releasegroup != null &&
+      t.releasegroup.trim() !== '' &&
+      is1080pResolution(t.respix || ''),
+    
+    // Priority 7: releasegroup != null AND seeders > 10
+    (t: TorrentInfo) =>
+      t.releasegroup != null &&
+      t.releasegroup.trim() !== '' &&
+      t.seeders > 10,
+    
+    // Priority 8: releasegroup != null AND seeders > 0
+    (t: TorrentInfo) =>
+      t.releasegroup != null &&
+      t.releasegroup.trim() !== '' &&
+      t.seeders > 0,
+    
+    // Priority 9: releasegroup != null AND seeders >= 0
+    (t: TorrentInfo) =>
+      t.releasegroup != null && t.releasegroup.trim() !== '',
+    
+    // Priority 10: (4k OR 1080p) AND seeders > 10
+    (t: TorrentInfo) =>
+      isHighQualityResolution(t.respix || '') && t.seeders > 10,
+    
+    // Priority 11: (4k OR 1080p) AND seeders > 0
+    (t: TorrentInfo) =>
+      isHighQualityResolution(t.respix || '') && t.seeders > 0,
+    
+    // Priority 12: (4k OR 1080p) AND seeders >= 0
+    (t: TorrentInfo) => isHighQualityResolution(t.respix || ''),
+    
+    // Priority 13: seeders > 10
+    (t: TorrentInfo) => t.seeders > 10,
+    
+    // Priority 14: seeders > 0
+    (t: TorrentInfo) => t.seeders > 0,
+    
+    // Priority 15: seeders >= 0 (any resource)
+    (_t: TorrentInfo) => true,
+  ];
+
+  // Try each priority level
+  for (const filter of priorityFilters) {
+    const filtered = mergedTorrents.filter(filter);
+    if (filtered.length > 0) {
+      // Sort by resolution and seeders, then return the first one
+      const sorted = sortByResolutionAndSeeders(filtered);
+      return sorted[0];
+    }
+  }
+
+  // Fallback: return null if no resource found (shouldn't happen with priority 15)
+  return null;
+}
+
