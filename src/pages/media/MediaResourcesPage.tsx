@@ -22,6 +22,8 @@ import {
   ListItem,
   Tabs,
   Tab,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -43,6 +45,16 @@ const MediaResourcesPage: React.FC = () => {
   const [recommendedResource, setRecommendedResource] = useState<TorrentInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [downloadingResources, setDownloadingResources] = useState<Set<number>>(new Set());
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
 
   useEffect(() => {
     const fetchMovieResources = async () => {
@@ -103,7 +115,11 @@ const MediaResourcesPage: React.FC = () => {
               
               if (initialTab) {
                 setSelectedTab(initialTab);
-                setResources(processed.groupedResources[initialTab]);
+                // Filter out recommended resource from the list
+                const filteredResources = processed.groupedResources[initialTab].filter(
+                  (resource) => !recommended || resource.id !== recommended.id
+                );
+                setResources(filteredResources);
               } else {
                 // This shouldn't happen if hasResources is true, but handle it
                 setResources([]);
@@ -134,22 +150,41 @@ const MediaResourcesPage: React.FC = () => {
 
 
   const handleDownload = async (resource: TorrentInfo) => {
+    const resourceId = resource.id;
+    
+    // Set loading state for this specific resource
+    setDownloadingResources(prev => new Set(prev).add(resourceId));
+    
     try {
-      // Show loading state
-      setIsLoading(true);
-      
       // Start the download using the API service
       await startDownload(resource.id.toString(), id || '');
       
-      // Navigate to downloads page
-      navigate('/downloads');
+      // Show success notification
+      setSnackbar({
+        open: true,
+        message: '下载已开始',
+        severity: 'success',
+      });
     } catch (err) {
       console.error('Download error:', err);
-      // Show error message to user
-      setError('Failed to start download. Please try again.');
+      // Show error notification
+      setSnackbar({
+        open: true,
+        message: '下载失败，请重试',
+        severity: 'error',
+      });
     } finally {
-      setIsLoading(false);
+      // Remove loading state for this resource
+      setDownloadingResources(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(resourceId);
+        return newSet;
+      });
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
   };
 
   if (isLoading) {
@@ -362,8 +397,15 @@ const MediaResourcesPage: React.FC = () => {
                     variant="contained"
                     color="primary"
                     size="large"
-                    startIcon={<DownloadIcon />}
+                    startIcon={
+                      downloadingResources.has(recommendedResource.id) ? (
+                        <CircularProgress size={16} color="inherit" />
+                      ) : (
+                        <DownloadIcon />
+                      )
+                    }
                     onClick={() => handleDownload(recommendedResource)}
+                    disabled={downloadingResources.has(recommendedResource.id)}
                     sx={{
                       ml: { sm: 2 },
                       minWidth: '120px',
@@ -371,7 +413,7 @@ const MediaResourcesPage: React.FC = () => {
                       fontWeight: 'bold',
                     }}
                   >
-                    Download
+                    {downloadingResources.has(recommendedResource.id) ? '下载中...' : 'Download'}
                   </Button>
                 </Box>
               </Card>
@@ -391,8 +433,14 @@ const MediaResourcesPage: React.FC = () => {
                 <>
                   {/* Resolution Tabs - only show tabs with resources */}
                   {(() => {
+                    // Filter tabs that have resources after excluding recommended resource
                     const tabsWithResources = (['4k', '2k', '1080p', 'other'] as const).filter(
-                      (tab) => processedResources.groupedResources[tab].length > 0
+                      (tab) => {
+                        const filteredResources = processedResources.groupedResources[tab].filter(
+                          (resource) => !recommendedResource || resource.id !== recommendedResource.id
+                        );
+                        return filteredResources.length > 0;
+                      }
                     );
 
                     // If no tabs have resources, this shouldn't happen (should show "未发现资源")
@@ -405,12 +453,44 @@ const MediaResourcesPage: React.FC = () => {
                         value={selectedTab}
                         onChange={(_, newValue: keyof GroupedResources) => {
                           setSelectedTab(newValue);
-                          setResources(processedResources.groupedResources[newValue]);
+                          // Filter out recommended resource from the list
+                          const filteredResources = processedResources.groupedResources[newValue].filter(
+                            (resource) => !recommendedResource || resource.id !== recommendedResource.id
+                          );
+                          setResources(filteredResources);
                         }}
-                        sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
+                        sx={{
+                          mb: 3,
+                          borderBottom: 1,
+                          borderColor: 'divider',
+                          bgcolor: 'background.paper',
+                          borderRadius: 2,
+                          px: 2,
+                          boxShadow: 2,
+                          '& .MuiTab-root': {
+                            fontSize: '0.95rem',
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            minHeight: 48,
+                            py: 1.5,
+                            px: 3,
+                            '&.Mui-selected': {
+                              color: 'primary.main',
+                              fontWeight: 700,
+                            },
+                          },
+                          '& .MuiTabs-indicator': {
+                            height: 3,
+                            borderRadius: '3px 3px 0 0',
+                          },
+                        }}
                       >
                         {tabsWithResources.map((tab) => {
-                          const count = processedResources.groupedResources[tab].length;
+                          // Calculate count excluding recommended resource
+                          const filteredResources = processedResources.groupedResources[tab].filter(
+                            (resource) => !recommendedResource || resource.id !== recommendedResource.id
+                          );
+                          const count = filteredResources.length;
                           return (
                             <Tab
                               key={tab}
@@ -432,7 +512,9 @@ const MediaResourcesPage: React.FC = () => {
                     </Box>
                   ) : (
                     <List>
-                      {resources.map((resource) => (
+                      {resources
+                        .filter((resource) => !recommendedResource || resource.id !== recommendedResource.id)
+                        .map((resource) => (
                         <ListItem
                           key={resource.id}
                           sx={{
@@ -482,15 +564,22 @@ const MediaResourcesPage: React.FC = () => {
                           <Button
                             variant="contained"
                             color="primary"
-                            startIcon={<DownloadIcon />}
+                            startIcon={
+                              downloadingResources.has(resource.id) ? (
+                                <CircularProgress size={16} color="inherit" />
+                              ) : (
+                                <DownloadIcon />
+                              )
+                            }
                             onClick={() => handleDownload(resource)}
+                            disabled={downloadingResources.has(resource.id)}
                             sx={{ 
                               ml: { sm: 2 },
                               minWidth: '120px',
                               flexShrink: 0,
                             }}
                           >
-                            Download
+                            {downloadingResources.has(resource.id) ? '下载中...' : 'Download'}
                           </Button>
                         </ListItem>
                       ))}
@@ -555,15 +644,22 @@ const MediaResourcesPage: React.FC = () => {
                     <Button
                       variant="contained"
                       color="primary"
-                      startIcon={<DownloadIcon />}
+                      startIcon={
+                        downloadingResources.has(resource.id) ? (
+                          <CircularProgress size={16} color="inherit" />
+                        ) : (
+                          <DownloadIcon />
+                        )
+                      }
                       onClick={() => handleDownload(resource)}
+                      disabled={downloadingResources.has(resource.id)}
                       sx={{ 
                         ml: { sm: 2 },
                         minWidth: '120px',
                         flexShrink: 0,
                       }}
                     >
-                      Download
+                      {downloadingResources.has(resource.id) ? '下载中...' : 'Download'}
                     </Button>
                   </ListItem>
                 ))}
@@ -572,6 +668,23 @@ const MediaResourcesPage: React.FC = () => {
           )}
         </Box>
       </Container>
+      
+      {/* Snackbar for download notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </MainLayout>
   );
 };

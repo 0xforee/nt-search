@@ -128,6 +128,18 @@ const MediaDetailsPage: React.FC = () => {
             </Stack>
             <Typography variant="body1" color="text.secondary" lineHeight={1.6} mb={4} sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.7)' }}>{movie.overview}</Typography>
 
+            {/* Search Resources Button */}
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<PlayArrowIcon />}
+              onClick={() => navigate(`/media/${id}/resources?type=${searchParams.get('type') || 'MOV'}`, { state: { movie } })}
+              sx={{ mt: 2, mb: 4, py: 2, px: 4, fontSize: '1rem' }}
+            >
+              搜索资源
+            </Button>
+
             {/* Additional Info */}
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 2, mb: 4 }}>
               {movie.fact.map((fact, index) => (
@@ -139,18 +151,6 @@ const MediaDetailsPage: React.FC = () => {
                 </Card>
               ))}
             </Box>
-
-            {/* View Resources Button */}
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              startIcon={<PlayArrowIcon />}
-              onClick={() => navigate(`/media/${id}/resources?type=${searchParams.get('type') || 'MOV'}`, { state: { movie } })}
-              sx={{ mt: 2, py: 2, px: 4, fontSize: '1rem' }}
-            >
-              View Resources
-            </Button>
           </Box>
         </Container>
 
