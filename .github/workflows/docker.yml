@@ -93,30 +93,8 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ secrets.DOCKER_USERNAME }}/nt-search:latest
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          format: 'table'
 
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  deploy-staging:
-    runs-on: ubuntu-latest
-    name: Deploy to Staging
-    needs: [build-and-push, security-scan]
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    environment: staging
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy to staging server
-        run: |
-          echo "Deploying to staging environment..."
-          # Add your staging deployment commands here
-          # Example: SSH to server and run docker-compose
 
   deploy-production:
     runs-on: ubuntu-latest

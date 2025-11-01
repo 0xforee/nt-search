@@ -159,20 +159,13 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ secrets.DOCKER_USERNAME }}/nt-search:${{ needs.create-release.outputs.version }}
-          format: 'sarif'
-          output: 'trivy-results-alpine.sarif'
+          format: 'table'
 
       - name: Run Trivy vulnerability scanner (Debian)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ secrets.DOCKER_USERNAME }}/nt-search:${{ needs.create-release.outputs.version }}-debian
-          format: 'sarif'
-          output: 'trivy-results-debian.sarif'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results-alpine.sarif,trivy-results-debian.sarif'
+          format: 'table'
 
   notify:
     runs-on: ubuntu-latest
