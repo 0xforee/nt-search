@@ -4,16 +4,7 @@ This document describes the GitHub Actions workflows for the NT Search project.
 
 ## Workflows Overview
 
-### 1. **Test and Lint** (`.github/workflows/test.yml`)
-- **Trigger**: Push to main/master/develop branches, Pull Requests
-- **Purpose**: Code quality assurance
-- **Jobs**:
-  - `test`: Run linting, formatting checks, and build tests
-  - `docker-test`: Test Docker image builds (Alpine & Debian)
-  - `security-scan`: Security vulnerability scanning
-  - `quality-gate`: Overall quality assessment
-
-### 2. **Docker Build and Push** (`.github/workflows/docker.yml`)
+### 1. **Docker Build and Push** (`.github/workflows/docker.yml`)
 - **Trigger**: Push to main/master, Pull Requests, Manual dispatch
 - **Purpose**: Build and deploy Docker images
 - **Jobs**:
@@ -22,7 +13,7 @@ This document describes the GitHub Actions workflows for the NT Search project.
   - `deploy-staging`: Deploy to staging environment
   - `deploy-production`: Deploy to production environment
 
-### 3. **Release** (`.github/workflows/release.yml`)
+### 2. **Release** (`.github/workflows/release.yml`)
 - **Trigger**: Git tags (v*), Manual dispatch
 - **Purpose**: Create releases with Docker images
 - **Jobs**:
@@ -62,24 +53,6 @@ Enable branch protection for `main` branch:
 - Restrict pushes to main branch
 
 ## Workflow Details
-
-### Test Workflow
-
-```yaml
-# Triggers on every push and PR
-on:
-  push:
-    branches: [main, master, develop]
-  pull_request:
-    branches: [main, master, develop]
-```
-
-**Features**:
-- ✅ Linting and formatting checks
-- ✅ Build verification
-- ✅ Docker image testing
-- ✅ Security scanning
-- ✅ Quality gates
 
 ### Docker Workflow
 
@@ -214,11 +187,9 @@ gh run rerun <run-id>
 
 ## Best Practices
 
-1. **Always test locally** before pushing
-2. **Use semantic versioning** for releases
-3. **Review security scans** regularly
-4. **Monitor deployment health**
-5. **Keep dependencies updated**
+1. **Use semantic versioning** for releases
+2. **Review security scans** regularly
+3. **Monitor deployment health**
 
 ## Support
 
