@@ -5,6 +5,8 @@ import { useSearch } from '../../context/SearchContext';
 import MainLayout from '../../layouts/MainLayout';
 import { searchTorrentsAsync, getSearchTorrents, TorrentInfo } from '../../services/api';
 import { MovieData } from '../../types';
+import { processMovieResources, ProcessedMovieResources, GroupedResources } from '../../utils/movieUtils';
+import { processTVResources } from '../../utils/tvUtils';
 import {
   Box,
   Typography,
@@ -18,7 +20,8 @@ import {
   Stack,
   List,
   ListItem,
-  ListItemText,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -35,6 +38,8 @@ const MediaResourcesPage: React.FC = () => {
   const [movie, setMovie] = useState<MovieData | null>(null);
   const { setMovieResources } = useSearch();
   const [resources, setResources] = useState<TorrentInfo[]>([]);
+  const [processedResources, setProcessedResources] = useState<ProcessedMovieResources | null>(null);
+  const [selectedTab, setSelectedTab] = useState<keyof GroupedResources>('4k');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,27 +80,38 @@ const MediaResourcesPage: React.FC = () => {
         const searchResults = await getSearchTorrents();
         
         if (searchResults.success && searchResults.data) {
-          // Extract torrents from the search results
-          const torrents: TorrentInfo[] = [];
-          Object.values(searchResults.data.result).forEach((movieData) => {
-            if (movieData.torrent_dict) {
-              movieData.torrent_dict.forEach((entry) => {
-                if (Array.isArray(entry) && entry.length > 1) {
-                  const [_, categories] = entry;
-                  Object.values(categories).forEach((category) => {
-                    if (category.group_torrents) {
-                      Object.values(category.group_torrents).forEach((group) => {
-                        if (group.torrent_list) {
-                          torrents.push(...group.torrent_list);
-                        }
-                      });
-                    }
-                  });
-                }
-              });
+          // Determine if it's a movie or TV show by checking type_key from search results
+          // Get the first result to check type_key (MovieTorrentResource)
+          const firstResult = Object.values(searchResults.data.result)[0];
+          const isMovie = firstResult?.type_key === 'MOV' || firstResult?.type === '电影';
+          
+          if (isMovie) {
+            // Process movie resources
+            const processed = processMovieResources(searchResults);
+            setProcessedResources(processed);
+            
+            // Set initial resources based on seeders availability
+            if (processed.hasResources) {
+              // Get resources from the first available tab
+              const tabs: (keyof GroupedResources)[] = ['4k', '2k', '1080p', 'other'];
+              let initialTab = tabs.find(tab => processed.groupedResources[tab].length > 0);
+              
+              if (initialTab) {
+                setSelectedTab(initialTab);
+                setResources(processed.groupedResources[initialTab]);
+              } else {
+                // This shouldn't happen if hasResources is true, but handle it
+                setResources([]);
+              }
+            } else {
+              // No resources found
+              setResources([]);
             }
-          });
-          setResources(torrents);
+          } else {
+            // Process TV resources (temporarily return original)
+            const tvResources = processTVResources(searchResults);
+            setResources(tvResources);
+          }
         } else {
           setError('No torrents found for this movie');
         }
@@ -250,69 +266,197 @@ const MediaResourcesPage: React.FC = () => {
             Available Resources
           </Typography>
 
-          {resources.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography variant="body1" color="text.secondary">
-                No resources available for this movie
-              </Typography>
-            </Box>
+          {/* Movie: Show tabs for grouped resources */}
+          {processedResources ? (
+            <>
+              {!processedResources.hasResources ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    未发现资源
+                  </Typography>
+                </Box>
+              ) : (
+                <>
+                  {/* Resolution Tabs - only show tabs with resources */}
+                  {(() => {
+                    const tabsWithResources = (['4k', '2k', '1080p', 'other'] as const).filter(
+                      (tab) => processedResources.groupedResources[tab].length > 0
+                    );
+
+                    // If no tabs have resources, this shouldn't happen (should show "未发现资源")
+                    if (tabsWithResources.length === 0) {
+                      return null;
+                    }
+
+                    return (
+                      <Tabs
+                        value={selectedTab}
+                        onChange={(_, newValue: keyof GroupedResources) => {
+                          setSelectedTab(newValue);
+                          setResources(processedResources.groupedResources[newValue]);
+                        }}
+                        sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
+                      >
+                        {tabsWithResources.map((tab) => {
+                          const count = processedResources.groupedResources[tab].length;
+                          return (
+                            <Tab
+                              key={tab}
+                              label={`${tab.toUpperCase()} (${count})`}
+                              value={tab}
+                            />
+                          );
+                        })}
+                      </Tabs>
+                    );
+                  })()}
+
+                  {/* Resources for selected tab */}
+                  {resources.length === 0 ? (
+                    <Box sx={{ textAlign: 'center', py: 4 }}>
+                      <Typography variant="body1" color="text.secondary">
+                        No resources in {selectedTab.toUpperCase()} category
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <List>
+                      {resources.map((resource) => (
+                        <ListItem
+                          key={resource.id}
+                          sx={{
+                            bgcolor: 'background.paper',
+                            borderRadius: 1,
+                            mb: 2,
+                            boxShadow: 1,
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            justifyContent: 'space-between',
+                            p: 2,
+                          }}
+                        >
+                          <Box sx={{ flexGrow: 1, mb: { xs: 1, sm: 0 }, minWidth: 0 }}>
+                            <Typography 
+                              variant="subtitle1" 
+                              component="div" 
+                              gutterBottom
+                              sx={{
+                                wordBreak: 'break-word',
+                                overflowWrap: 'break-word',
+                                maxWidth: { sm: '60ch' },
+                              }}
+                            >
+                              {resource.torrent_name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" component="div" sx={{ mt: 0.5, mb: 1 }}>
+                              {resource.description}
+                            </Typography>
+                            <Stack
+                              direction="row"
+                              alignItems="center"
+                              spacing={1}
+                              flexWrap="wrap"
+                            >
+                              <Chip label={resource.video_encode} size="small" color="primary" />
+                              <Chip label={resource.size} size="small" color="secondary" />
+                              <Chip
+                                label={`${resource.seeders} seeders`}
+                                size="small"
+                                color={resource.seeders > 0 ? 'success' : 'default'}
+                              />
+                              <Chip label={resource.site} size="small" color="info" />
+                            </Stack>
+                          </Box>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<DownloadIcon />}
+                            onClick={() => handleDownload(resource)}
+                            sx={{ 
+                              ml: { sm: 2 },
+                              minWidth: '120px',
+                              flexShrink: 0,
+                            }}
+                          >
+                            Download
+                          </Button>
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+                </>
+              )}
+            </>
           ) : (
-            <List>
-              {resources.map((resource) => (
-                <ListItem
-                  key={resource.id}
-                  sx={{
-                    bgcolor: 'background.paper',
-                    borderRadius: 1,
-                    mb: 2,
-                    boxShadow: 1,
-                    display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'flex-start', sm: 'center' },
-                    justifyContent: 'space-between',
-                    p: 2,
-                  }}
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="subtitle1" component="span">
+            /* TV or fallback: Show simple list */
+            resources.length === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Typography variant="body1" color="text.secondary">
+                  No resources available
+                </Typography>
+              </Box>
+            ) : (
+              <List>
+                {resources.map((resource) => (
+                  <ListItem
+                    key={resource.id}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      borderRadius: 1,
+                      mb: 2,
+                      boxShadow: 1,
+                      display: 'flex',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      alignItems: { xs: 'flex-start', sm: 'center' },
+                      justifyContent: 'space-between',
+                      p: 2,
+                    }}
+                  >
+                    <Box sx={{ flexGrow: 1, mb: { xs: 1, sm: 0 }, minWidth: 0 }}>
+                      <Typography 
+                        variant="subtitle1" 
+                        component="div" 
+                        gutterBottom
+                        sx={{
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: { sm: '60ch' },
+                        }}
+                      >
                         {resource.torrent_name}
                       </Typography>
-                    }
-                    secondary={
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" mt={0.5}>
-                          {resource.description}
-                        </Typography>
+                      <Typography variant="body2" color="text.secondary" component="div" sx={{ mt: 0.5, mb: 1 }}>
+                        {resource.description}
+                      </Typography>
                         <Stack
                           direction="row"
                           alignItems="center"
                           spacing={1}
-                          mt={1}
                           flexWrap="wrap"
                         >
-                          <Chip label={resource.respix} size="small" />
-                          <Chip label={resource.video_encode} size="small" />
-                          <Chip label={resource.size} size="small" />
+                          <Chip label={resource.video_encode} size="small" color="primary" />
+                          <Chip label={resource.size} size="small" color="secondary" />
                           <Chip label={`${resource.seeders} seeders`} size="small" />
-                          <Chip label={resource.site} size="small" />
+                          <Chip label={resource.site} size="small" color="info" />
                         </Stack>
-                      </Box>
-                    }
-                    sx={{ flexGrow: 1, mb: { xs: 1, sm: 0 } }}
-                  />
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<DownloadIcon />}
-                    onClick={() => handleDownload(resource)}
-                    sx={{ ml: { sm: 2 } }}
-                  >
-                    Download
-                  </Button>
-                </ListItem>
-              ))}
-            </List>
+                    </Box>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<DownloadIcon />}
+                      onClick={() => handleDownload(resource)}
+                      sx={{ 
+                        ml: { sm: 2 },
+                        minWidth: '120px',
+                        flexShrink: 0,
+                      }}
+                    >
+                      Download
+                    </Button>
+                  </ListItem>
+                ))}
+              </List>
+            )
           )}
         </Box>
       </Container>
