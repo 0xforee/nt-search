@@ -22,61 +22,71 @@ const HomePage: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-between',
           minHeight: 'calc(100vh - 128px)', // Adjust based on header/footer height
           textAlign: 'center',
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom>
-          Welcome, {user?.username}!
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary" paragraph>
-          Search for your favorite movies and TV shows
-        </Typography>
-        
-        <Box sx={{ mb: 3 }}>
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/advanced-search')}
-            sx={{ mr: 2 }}
-          >
-            高级搜索
-          </Button>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Welcome, {user?.username}!
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary" paragraph>
+            Search for your favorite movies and TV shows
+          </Typography>
+          
+          {/* Temporarily hidden */}
+          {/* <Box sx={{ mb: 3 }}>
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/advanced-search')}
+              sx={{ mr: 2 }}
+            >
+              高级搜索
+            </Button>
+          </Box> */}
+          
+          <Box component="form" onSubmit={handleSearch} sx={{ width: '100%', maxWidth: 600, mt: 3 }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search for movies or TV shows..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{
+                borderRadius: '50px',
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '50px',
+                  paddingRight: '100px', // Make space for the button
+                },
+              }}
+            >
+              <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={isSearching || !searchQuery.trim()}
+              sx={{
+                right: 8,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                borderRadius: '50px',
+                height: '16px',
+                minWidth: '100px',
+              }}
+            >
+              {isSearching ? <CircularProgress size={24} color="inherit" /> : 'Search'}
+            </Button>
+              </TextField>
+            
+          </Box>
         </Box>
         
-        <Box component="form" onSubmit={handleSearch} sx={{ width: '100%', maxWidth: 600, mt: 3 }}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Search for movies or TV shows..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{
-              borderRadius: '50px',
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '50px',
-                paddingRight: '100px', // Make space for the button
-              },
-            }}
-          >
-            <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={isSearching || !searchQuery.trim()}
-            sx={{
-              right: 8,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              borderRadius: '50px',
-              height: '16px',
-              minWidth: '100px',
-            }}
-          >
-            {isSearching ? <CircularProgress size={24} color="inherit" /> : 'Search'}
-          </Button>
-            </TextField>
-          
+        {/* Version at bottom */}
+        <Box sx={{ py: 2 }}>
+          <Typography variant="caption" color="text.secondary">
+            Version {import.meta.env.VITE_APP_VERSION}
+          </Typography>
         </Box>
       </Box>
     </Container>
