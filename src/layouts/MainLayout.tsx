@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDownload } from '../context/DownloadContext';
 import { useAuth } from '../context/AuthContext';
-import { AppBar, Toolbar, IconButton, Typography, Box, Menu, MenuItem, Fab, Badge } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Box, Menu, MenuItem, Fab, Badge, Tabs, Tab } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -11,9 +11,11 @@ import DownloadIcon from '@mui/icons-material/Download';
 interface MainLayoutProps {
   children: React.ReactNode;
   title?: string;
+  homeTab?: number;
+  onHomeTabChange?: (tab: number) => void;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children, title, homeTab, onHomeTabChange }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { activeDownloads } = useDownload();
@@ -50,7 +52,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
           borderColor: 'divider'
         }}
       >
-        <Toolbar disableGutters sx={{ px: 2 }}>
+        <Toolbar disableGutters sx={{ px: 2, position: 'relative' }}>
           {showNavBar && (
             <IconButton
               size="large"
@@ -63,11 +65,52 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
               <ArrowBackIcon />
             </IconButton>
           )}
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {title || (isHomePage ? 'Home' : '')}
-          </Typography>
+          
+          {isHomePage ? (
+            <>
+              {/* Logo/Title */}
+              <Typography variant="h6" component="div" sx={{ fontWeight: 600, minWidth: 'fit-content' }}>
+                NT Search
+              </Typography>
+              
+              {/* Tabs - Centered */}
+              <Box sx={{ 
+                position: 'absolute', 
+                left: '50%', 
+                transform: 'translateX(-50%)',
+                width: 'fit-content'
+              }}>
+                <Tabs 
+                  value={homeTab ?? 0} 
+                  onChange={(_, newValue) => onHomeTabChange?.(newValue)}
+                  sx={{
+                    '& .MuiTab-root': {
+                      fontSize: '0.95rem',
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      minHeight: 48,
+                      px: 2,
+                    },
+                    '& .MuiTabs-indicator': {
+                      height: 3,
+                    },
+                  }}
+                >
+                  <Tab label="首页" />
+                  <Tab label="电影" />
+                  <Tab label="电视剧" />
+                </Tabs>
+              </Box>
+            </>
+          ) : (
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              {title || ''}
+            </Typography>
+          )}
+          
+          {/* User Menu - Always visible on home page */}
           {isHomePage && (
-            <div>
+            <Box sx={{ ml: 'auto' }}>
               <IconButton
                 size="large"
                 aria-label="account of current user"
@@ -75,6 +118,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
                 aria-haspopup="true"
                 onClick={handleMenu}
                 color="inherit"
+                sx={{ ml: 2 }}
               >
                 <AccountCircle />
               </IconButton>
@@ -97,7 +141,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
                   <LogoutIcon sx={{ mr: 1 }} /> Logout
                 </MenuItem>
               </Menu>
-            </div>
+            </Box>
           )}
         </Toolbar>
       </AppBar>

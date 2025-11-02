@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { DownloadProvider } from './context/DownloadContext';
@@ -14,6 +14,17 @@ import DownloadsPage from './pages/DownloadsPage';
 import AdvancedSearchPage from './pages/search/AdvancedSearchPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Wrapper component for HomePage to manage tab state
+const HomePageWrapper: React.FC = () => {
+  const [currentTab, setCurrentTab] = useState(0);
+  
+  return (
+    <MainLayout homeTab={currentTab} onHomeTabChange={setCurrentTab}>
+      <HomePage currentTab={currentTab} onTabChange={setCurrentTab} />
+    </MainLayout>
+  );
+};
+
 const AppRoutes: React.FC = () => {
   return (
     <Router>
@@ -27,9 +38,7 @@ const AppRoutes: React.FC = () => {
               path="/"
               element={
                 <ProtectedRoute>
-                  <MainLayout>
-                    <HomePage />
-                  </MainLayout>
+                  <HomePageWrapper />
                 </ProtectedRoute>
               }
             />
