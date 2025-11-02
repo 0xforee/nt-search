@@ -159,12 +159,8 @@ const MediaResourcesPage: React.FC = () => {
       // Start the download using the API service
       await startDownload(resource.id.toString(), id || '');
       
-      // Show success notification
-      setSnackbar({
-        open: true,
-        message: '下载已开始',
-        severity: 'success',
-      });
+      // If successful, navigate to downloads page
+      navigate('/downloads');
     } catch (err) {
       console.error('Download error:', err);
       // Show error notification
@@ -173,8 +169,7 @@ const MediaResourcesPage: React.FC = () => {
         message: '下载失败，请重试',
         severity: 'error',
       });
-    } finally {
-      // Remove loading state for this resource
+      // Remove loading state on error
       setDownloadingResources(prev => {
         const newSet = new Set(prev);
         newSet.delete(resourceId);

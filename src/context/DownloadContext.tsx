@@ -41,44 +41,18 @@ export const DownloadProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const addDownload = useCallback(async (download: Omit<Download, 'id' | 'startedAt'>) => {
     try {
-      // Create a temporary download object with pending status
-      const tempId = Date.now().toString();
-      const newDownload: Download = {
-        ...download,
-        id: tempId,
-        startedAt: new Date().toISOString(),
-        progress: 0,
-        speed: '',
-        status: 'pending'
-      };
-      
-      // Add to active downloads immediately to show in UI
-      setActiveDownloads(prev => [...prev, newDownload]);
-      
       // Make API call to initiate the download
       const response = await initiateDownload(download.resourceId);
       
       if (response.success) {
-        // Update the download with the real ID from the server if provided
-        const downloadId = response.data.downloadId || tempId;
+        // Get the download ID from the server response
+        const downloadId = response.data.downloadId || response.data.resourceId;
         
-        setActiveDownloads(prev => 
-          prev.map(d => 
-            d.id === tempId 
-              ? { 
-                  ...d, 
-                  id: downloadId,
-                  status: 'downloading',
-                  filePath: response.data.filePath
-                }
-              : d
-          )
-        );
-        
+        // Return the download ID on success
+        // UI will be updated by fetching active downloads after navigation
         return downloadId;
       } else {
-        // If API call failed, update the download status to failed
-        failDownload(tempId, response.message || 'Failed to initiate download');
+        // If API call failed, throw error
         throw new Error(response.message || 'Failed to initiate download');
       }
     } catch (error) {
