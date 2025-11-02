@@ -6,11 +6,28 @@ import { updateApiBaseUrl } from '../../services/http-client';
 import { LoginCredentials } from '../../types';
 import { Container, Box, Typography, TextField, Button, Link } from '@mui/material';
 
+// Helper function to normalize API base URL (add /api/v1 if not present)
+const normalizeApiBaseUrl = (url: string): string => {
+  const trimmed = url.trim();
+  if (!trimmed) return trimmed;
+  
+  // Remove trailing slashes
+  const cleaned = trimmed.replace(/\/+$/, '');
+  
+  // Check if it already ends with /api/v1
+  if (cleaned.endsWith('/api/v1')) {
+    return cleaned;
+  }
+  
+  // Add /api/v1 if not present
+  return `${cleaned}/api/v1`;
+};
+
 const validationRules = {
   apiBaseUrl: {
     required: true,
     pattern: /^https?:\/\/.+/,
-    message: '需要有效的API基础URL（例如：http://localhost:3000/api/v1）',
+    message: '需要有效的服务器地址（例如：http://localhost:3000）',
   },
   username: {
     required: true,
@@ -53,12 +70,14 @@ const LoginPage: React.FC = () => {
     // Load saved API base URL from localStorage
     const savedApiUrl = localStorage.getItem('api_base_url');
     if (savedApiUrl) {
-      setApiBaseUrl(savedApiUrl);
+      // Remove /api/v1 suffix if present to show only host+port in input
+      const displayUrl = savedApiUrl.replace(/\/api\/v1\/?$/, '');
+      setApiBaseUrl(displayUrl);
       // Validate initial value - validation hook will automatically trim
-      const validationData = { username: '', password: '', apiBaseUrl: savedApiUrl };
+      const validationData = { username: '', password: '', apiBaseUrl: displayUrl };
       validateForm(validationData);
     } else {
-      const defaultUrl = 'http://localhost:3000/api/v1';
+      const defaultUrl = 'http://localhost:3000';
       setApiBaseUrl(defaultUrl);
       // Validate default value
       const validationData = { username: '', password: '', apiBaseUrl: defaultUrl };
@@ -82,8 +101,9 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    // Save API base URL before login
-    updateApiBaseUrl(trimmedApiBaseUrl);
+    // Normalize API base URL (add /api/v1 if not present) before saving
+    const normalizedApiBaseUrl = normalizeApiBaseUrl(trimmedApiBaseUrl);
+    updateApiBaseUrl(normalizedApiBaseUrl);
 
     try {
       await login(formData);
@@ -112,13 +132,13 @@ const LoginPage: React.FC = () => {
             required
             fullWidth
             id="apiBaseUrl"
-            label="API基础URL"
+            label="服务器地址"
             name="apiBaseUrl"
-            placeholder="http://localhost:3000/api/v1"
+            placeholder="http://localhost:3000"
             value={apiBaseUrl}
             onChange={handleChange}
             error={!!errors.apiBaseUrl}
-            helperText={errors.apiBaseUrl || "输入API服务器的基础URL"}
+            helperText={errors.apiBaseUrl || "输入服务器地址（例如：http://localhost:3000），系统会自动补全 /api/v1"}
             autoFocus
           />
           <TextField

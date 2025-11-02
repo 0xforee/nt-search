@@ -11,9 +11,29 @@ interface ApiOptions {
 
 const DEFAULT_API_BASE_URL = 'http://localhost:3000/api/v1';
 
+// Helper function to normalize API base URL (add /api/v1 if not present)
+const normalizeApiBaseUrl = (url: string): string => {
+  if (!url) return DEFAULT_API_BASE_URL;
+  
+  // Remove trailing slashes
+  const cleaned = url.trim().replace(/\/+$/, '');
+  
+  // Check if it already ends with /api/v1
+  if (cleaned.endsWith('/api/v1')) {
+    return cleaned;
+  }
+  
+  // Add /api/v1 if not present
+  return `${cleaned}/api/v1`;
+};
+
 // Get API base URL from localStorage or use default
 const getApiBaseUrl = (): string => {
-  return localStorage.getItem('api_base_url') || DEFAULT_API_BASE_URL;
+  const savedUrl = localStorage.getItem('api_base_url');
+  if (savedUrl) {
+    return normalizeApiBaseUrl(savedUrl);
+  }
+  return DEFAULT_API_BASE_URL;
 };
 
 // Create axios instance with configurable base URL
@@ -31,7 +51,9 @@ let axiosInstance: AxiosInstance = createAxiosInstance();
 
 // Function to update the axios instance with new base URL
 export const updateApiBaseUrl = (newBaseUrl: string): void => {
-  localStorage.setItem('api_base_url', newBaseUrl);
+  // Normalize the URL before saving
+  const normalizedUrl = normalizeApiBaseUrl(newBaseUrl);
+  localStorage.setItem('api_base_url', normalizedUrl);
   axiosInstance = createAxiosInstance();
   
   // Re-add interceptors to the new instance

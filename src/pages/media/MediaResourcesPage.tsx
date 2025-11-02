@@ -356,8 +356,8 @@ const MediaResourcesPage: React.FC = () => {
                     <Stack
                       direction="row"
                       alignItems="center"
-                      spacing={1}
                       flexWrap="wrap"
+                      sx={{ gap: 1 }}
                     >
                       <Chip
                         label={recommendedResource.video_encode}
