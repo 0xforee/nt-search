@@ -71,7 +71,7 @@ const MediaDetailsPage: React.FC = () => {
       <MainLayout>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
           <CircularProgress color="primary" size={60} />
-          <Typography variant="h6" color="text.primary" ml={2}>Loading movie details...</Typography>
+          <Typography variant="h6" color="text.primary" ml={2}>正在加载电影详情...</Typography>
         </Box>
       </MainLayout>
     );
@@ -81,13 +81,13 @@ const MediaDetailsPage: React.FC = () => {
     return (
       <MainLayout>
         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
-          <Typography variant="h6" color="error" mb={2}>{error || 'Movie not found'}</Typography>
+          <Typography variant="h6" color="error" mb={2}>{error || '电影未找到'}</Typography>
           <Button
             variant="contained"
             color="primary"
             onClick={() => navigate(-1)}
           >
-            Go Back
+            返回
           </Button>
         </Box>
       </MainLayout>
@@ -159,7 +159,7 @@ const MediaDetailsPage: React.FC = () => {
           <Container maxWidth="lg">
             {/* Cast Section */}
             <Box mb={6}>
-              <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>Cast</Typography>
+              <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>演员</Typography>
               <Box sx={{ display: 'flex', overflowX: 'auto', pb: 2, '&::-webkit-scrollbar': { height: '8px' }, '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '10px' } }}>
                 {movie.actors.slice(0, 10).map((actor) => (
                   <Box key={actor.id} sx={{ flexShrink: 0, textAlign: 'center', width: 120 }}>
@@ -177,7 +177,7 @@ const MediaDetailsPage: React.FC = () => {
 
             {/* Crew Section */}
             <Box mb={6}>
-              <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>Crew</Typography>
+              <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>制作团队</Typography>
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 3 }}>
                 {movie.crews.map((crew, index) => (
                   <Card key={index} sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3, '&:hover': { bgcolor: 'grey.800' }, transition: 'background-color 0.3s' }}>
@@ -193,7 +193,7 @@ const MediaDetailsPage: React.FC = () => {
             {/* Background Images */}
             {movie.background.length > 0 && (
               <Box>
-                <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>Background Images</Typography>
+                <Typography variant="h6" component="h2" color="text.primary" fontWeight="bold" mb={3}>背景图片</Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
                   {movie.background.map((bg, index) => (
                     <Box key={index}>

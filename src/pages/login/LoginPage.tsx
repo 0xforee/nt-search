@@ -10,18 +10,18 @@ const validationRules = {
   apiBaseUrl: {
     required: true,
     pattern: /^https?:\/\/.+/,
-    message: 'Valid API Base URL is required (e.g., http://localhost:3000/api/v1)',
+    message: '需要有效的API基础URL（例如：http://localhost:3000/api/v1）',
   },
   username: {
     required: true,
     minLength: 3,
     maxLength: 20,
-    message: 'Username is required',
+    message: '用户名是必填项',
   },
   password: {
     required: true,
     minLength: 3,
-    message: 'Password is required',
+    message: '密码是必填项',
   },
 };
 
@@ -104,7 +104,7 @@ const LoginPage: React.FC = () => {
         }}
       >
         <Typography component="h1" variant="h5">
-          Welcome Back
+          欢迎回来
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
@@ -112,13 +112,13 @@ const LoginPage: React.FC = () => {
             required
             fullWidth
             id="apiBaseUrl"
-            label="API Base URL"
+            label="API基础URL"
             name="apiBaseUrl"
             placeholder="http://localhost:3000/api/v1"
             value={apiBaseUrl}
             onChange={handleChange}
             error={!!errors.apiBaseUrl}
-            helperText={errors.apiBaseUrl || "Enter the base URL for the API server"}
+            helperText={errors.apiBaseUrl || "输入API服务器的基础URL"}
             autoFocus
           />
           <TextField
@@ -126,7 +126,7 @@ const LoginPage: React.FC = () => {
             required
             fullWidth
             id="username"
-            label="Username"
+            label="用户名"
             name="username"
             autoComplete="username"
             value={formData.username}
@@ -139,7 +139,7 @@ const LoginPage: React.FC = () => {
             required
             fullWidth
             name="password"
-            label="Password"
+            label="密码"
             type="password"
             id="password"
             autoComplete="current-password"
@@ -160,10 +160,10 @@ const LoginPage: React.FC = () => {
             sx={{ mt: 3, mb: 2 }}
             disabled={isLoading || !isValid}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? '登录中...' : '登录'}
           </Button>
           <Link href="#" variant="body2">
-            Forgot password?
+            忘记密码？
           </Link>
         </Box>
       </Box>

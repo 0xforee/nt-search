@@ -97,7 +97,7 @@ const DownloadsPage: React.FC = () => {
               </Box>
             ) : (
               activeDownloads.map(download => {
-                const title = (download as any).title || 'Movie Title';
+                const title = (download as any).title || '电影标题';
                 const image = (download as any).image || '';
                 const state = (download as any).state || download.status;
                 const speedText = typeof download.speed === 'string' ? download.speed : `${download.speed} MB/s`;
@@ -184,7 +184,7 @@ const DownloadsPage: React.FC = () => {
               </Box>
             ) : (
               paginatedCompletedDownloads.map((item: any) => {
-                const title = item.title || 'Movie Title';
+                const title = item.title || '电影标题';
                 const image = item.image || '';
                 const name = item.name || '';
                 const status = item.status || 'completed';

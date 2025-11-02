@@ -72,11 +72,11 @@ const MediaResourcesPage: React.FC = () => {
           // If no movie data passed via state, we can't proceed without it.
           // This scenario should ideally be handled by navigating from a page
           // that provides movie data (e.g., search results or movie details).
-          throw new Error('Movie data not found. Please navigate from a valid movie page.');
+          throw new Error('未找到电影数据，请从有效的电影页面导航。');
         }
         
         if(!currentMovie) {
-          throw new Error('Movie ID is required or movie data not found');
+          throw new Error('需要电影ID或未找到电影数据');
         }
         
         // Set the movie data
@@ -134,11 +134,11 @@ const MediaResourcesPage: React.FC = () => {
             setResources(tvResources);
           }
         } else {
-          setError('No torrents found for this movie');
+          setError('未找到此电影的种子资源');
         }
         
       } catch (err) {
-        setError('Failed to load resources. Please try again.');
+        setError('加载资源失败，请重试');
         console.error('Movie resources error:', err);
       } finally {
         setIsLoading(false);
@@ -199,7 +199,7 @@ const MediaResourcesPage: React.FC = () => {
           <Box display="flex" alignItems="center" gap={2}>
             <CircularProgress size={30} />
             <Typography variant="h6" color="text.secondary">
-              Loading resources...
+              正在加载资源...
             </Typography>
           </Box>
         </Box>
@@ -218,14 +218,14 @@ const MediaResourcesPage: React.FC = () => {
         >
           <Box textAlign="center">
             <Typography variant="body1" color="error" mb={2}>
-              {error || 'Movie not found'}
+              {error || '电影未找到'}
             </Typography>
             <Button
               variant="contained"
               startIcon={<ArrowBackIcon />}
               onClick={() => navigate(-1)}
             >
-              Go Back
+              返回
             </Button>
           </Box>
         </Box>
@@ -234,7 +234,7 @@ const MediaResourcesPage: React.FC = () => {
   }
 
   return (
-    <MainLayout title={`Resources for "${movie.title}"`}>
+    <MainLayout title={`"${movie.title}" 的资源`}>
       <Container maxWidth="md">
         {/* Movie Header */}
         <Box sx={{ position: 'relative', mb: 4 }}>
@@ -303,7 +303,7 @@ const MediaResourcesPage: React.FC = () => {
         {/* Resources List */}
         <Box sx={{ mt: 4 }}>
           <Typography variant="h6" component="h2" mb={2}>
-            Available Resources
+            可用资源
           </Typography>
 
           {/* Recommended Resource */}
@@ -372,7 +372,7 @@ const MediaResourcesPage: React.FC = () => {
                         sx={{ fontWeight: 'bold' }}
                       />
                       <Chip
-                        label={`${recommendedResource.seeders} seeders`}
+                        label={`${recommendedResource.seeders} 做种者`}
                         size="small"
                         color={recommendedResource.seeders > 0 ? 'success' : 'default'}
                         sx={{ fontWeight: 'bold' }}
@@ -413,7 +413,7 @@ const MediaResourcesPage: React.FC = () => {
                       fontWeight: 'bold',
                     }}
                   >
-                    {downloadingResources.has(recommendedResource.id) ? '下载中...' : 'Download'}
+                    {downloadingResources.has(recommendedResource.id) ? '下载中...' : '下载'}
                   </Button>
                 </Box>
               </Card>
@@ -507,7 +507,7 @@ const MediaResourcesPage: React.FC = () => {
                   {resources.length === 0 ? (
                     <Box sx={{ textAlign: 'center', py: 4 }}>
                       <Typography variant="body1" color="text.secondary">
-                        No resources in {selectedTab.toUpperCase()} category
+                        {selectedTab.toUpperCase()} 分类中没有资源
                       </Typography>
                     </Box>
                   ) : (
@@ -554,7 +554,7 @@ const MediaResourcesPage: React.FC = () => {
                               <Chip label={resource.video_encode} size="small" color="primary" />
                               <Chip label={resource.size} size="small" color="secondary" />
                               <Chip
-                                label={`${resource.seeders} seeders`}
+                                label={`${resource.seeders} 做种者`}
                                 size="small"
                                 color={resource.seeders > 0 ? 'success' : 'default'}
                               />
@@ -579,7 +579,7 @@ const MediaResourcesPage: React.FC = () => {
                               flexShrink: 0,
                             }}
                           >
-                            {downloadingResources.has(resource.id) ? '下载中...' : 'Download'}
+                            {downloadingResources.has(resource.id) ? '下载中...' : '下载'}
                           </Button>
                         </ListItem>
                       ))}
@@ -593,7 +593,7 @@ const MediaResourcesPage: React.FC = () => {
             resources.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <Typography variant="body1" color="text.secondary">
-                  No resources available
+                  没有可用资源
                 </Typography>
               </Box>
             ) : (
@@ -637,7 +637,7 @@ const MediaResourcesPage: React.FC = () => {
                         >
                           <Chip label={resource.video_encode} size="small" color="primary" />
                           <Chip label={resource.size} size="small" color="secondary" />
-                          <Chip label={`${resource.seeders} seeders`} size="small" />
+                          <Chip label={`${resource.seeders} 做种者`} size="small" />
                           <Chip label={resource.site} size="small" color="info" />
                         </Stack>
                     </Box>
@@ -659,7 +659,7 @@ const MediaResourcesPage: React.FC = () => {
                         flexShrink: 0,
                       }}
                     >
-                      {downloadingResources.has(resource.id) ? '下载中...' : 'Download'}
+                      {downloadingResources.has(resource.id) ? '下载中...' : '下载'}
                     </Button>
                   </ListItem>
                 ))}

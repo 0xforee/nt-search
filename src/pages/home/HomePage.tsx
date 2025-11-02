@@ -29,10 +29,10 @@ const HomePage: React.FC = () => {
       >
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <Typography variant="h4" component="h1" gutterBottom>
-            Welcome, {user?.username}!
+            欢迎，{user?.username}！
           </Typography>
           <Typography variant="subtitle1" color="text.secondary" paragraph>
-            Search for your favorite movies and TV shows
+            搜索您喜爱的电影和电视剧
           </Typography>
           
           {/* Temporarily hidden */}
@@ -50,7 +50,7 @@ const HomePage: React.FC = () => {
             <TextField
               fullWidth
               variant="outlined"
-              placeholder="Search for movies or TV shows..."
+              placeholder="搜索电影或电视剧..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               sx={{
@@ -75,7 +75,7 @@ const HomePage: React.FC = () => {
                 minWidth: '100px',
               }}
             >
-              {isSearching ? <CircularProgress size={24} color="inherit" /> : 'Search'}
+              {isSearching ? <CircularProgress size={24} color="inherit" /> : '搜索'}
             </Button>
               </TextField>
             
@@ -85,7 +85,7 @@ const HomePage: React.FC = () => {
         {/* Version at bottom */}
         <Box sx={{ py: 2 }}>
           <Typography variant="caption" color="text.secondary">
-            Version {import.meta.env.VITE_APP_VERSION}
+            版本 {import.meta.env.VITE_APP_VERSION}
           </Typography>
         </Box>
       </Box>

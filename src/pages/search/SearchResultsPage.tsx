@@ -52,12 +52,12 @@ const SearchResultsPage: React.FC = () => {
 
         const data = await searchMedia(searchParams);
         if (!data.success) {
-          throw new Error(data.message || 'Search failed');
+          throw new Error(data.message || '搜索失败');
         }
 
         setSearchResults(data.data.Items as RspSearchItem[]);
       } catch (err) {
-        setError('Failed to fetch search results. Please try again.');
+        setError('获取搜索结果失败，请重试');
         console.error('Search error:', err);
       } finally {
         setIsLoading(false);
@@ -72,16 +72,16 @@ const SearchResultsPage: React.FC = () => {
     navigate(`/media/${id}?type=${mediaType}`);
   };
 
-  const searchTitle = query || 'Advanced Search';
+  const searchTitle = query || '高级搜索';
   const hasAdvancedFilters = type || year || season || sites || quality || resolution || promotion || rule;
 
   if (isLoading) {
     return (
-      <MainLayout title={`Search Results for "${searchTitle}"`}>
+      <MainLayout title={`"${searchTitle}" 的搜索结果`}>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
           <Box display="flex" alignItems="center" gap={2}>
             <CircularProgress size={32} />
-            <Typography variant="body1" color="text.primary">Loading results...</Typography>
+            <Typography variant="body1" color="text.primary">正在加载结果...</Typography>
           </Box>
         </Box>
       </MainLayout>
@@ -90,7 +90,7 @@ const SearchResultsPage: React.FC = () => {
 
   if (error) {
     return (
-      <MainLayout title={`Search Results for "${searchTitle}"`}>
+      <MainLayout title={`"${searchTitle}" 的搜索结果`}>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
           <Box textAlign="center">
             <Typography variant="body1" color="error" mb={2}>{error}</Typography>
@@ -99,7 +99,7 @@ const SearchResultsPage: React.FC = () => {
               variant="contained"
               color="primary"
             >
-              Try Again
+              重试
             </Button>
           </Box>
         </Box>
@@ -108,14 +108,14 @@ const SearchResultsPage: React.FC = () => {
   }
 
   return (
-    <MainLayout title={`Search Results for "${searchTitle}"`}>
+    <MainLayout title={`"${searchTitle}" 的搜索结果`}>
       <Container maxWidth="lg">
         {searchResults.length === 0 ? (
           <Box textAlign="center" color="text.secondary">
-            <Typography variant="body1">No results found for "{searchTitle}"</Typography>
+            <Typography variant="body1">未找到 "{searchTitle}" 的搜索结果</Typography>
             {hasAdvancedFilters && (
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Try adjusting your search filters or using different keywords.
+                请尝试调整搜索筛选条件或使用不同的关键词。
               </Typography>
             )}
           </Box>
