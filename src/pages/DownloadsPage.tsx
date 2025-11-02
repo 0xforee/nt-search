@@ -93,7 +93,7 @@ const DownloadsPage: React.FC = () => {
           <List>
             {activeDownloads.length === 0 ? (
               <Box textAlign="center" color="text.secondary" py={4}>
-                <Typography variant="body1">No active downloads</Typography>
+                <Typography variant="body1">暂无正在下载的任务</Typography>
               </Box>
             ) : (
               activeDownloads.map(download => {
@@ -101,6 +101,25 @@ const DownloadsPage: React.FC = () => {
                 const image = (download as any).image || '';
                 const state = (download as any).state || download.status;
                 const speedText = typeof download.speed === 'string' ? download.speed : `${download.speed} MB/s`;
+                
+                // Translate state to Chinese
+                const getStateText = (stateValue: string) => {
+                  const stateLower = stateValue.toLowerCase();
+                  if (stateLower === 'paused' || stateLower === 'stoped' || stateLower === 'stopped') {
+                    return '已暂停';
+                  } else if (stateLower === 'downloading') {
+                    return '下载中';
+                  } else if (stateLower === 'pending') {
+                    return '等待中';
+                  } else if (stateLower === 'completed') {
+                    return '已完成';
+                  } else if (stateLower === 'failed') {
+                    return '失败';
+                  }
+                  return stateValue;
+                };
+                
+                const stateText = getStateText(state);
                 
                 return (
                   <ListItem key={download.id} sx={{ bgcolor: 'background.paper', borderRadius: 1, mb: 2, boxShadow: 1 }}>
@@ -115,7 +134,7 @@ const DownloadsPage: React.FC = () => {
                       primary={<Typography variant="subtitle1" color="text.primary">{title}</Typography>}
                       secondary={
                         <Box>
-                          <Typography variant="body2" color="text.secondary" component="span">{download.progress}% - {state} - {speedText}</Typography>
+                          <Typography variant="body2" color="text.secondary" component="span">{download.progress}% - {stateText} - {speedText}</Typography>
                           <LinearProgress variant="determinate" value={download.progress} sx={{ mt: 0.5 }} />
                         </Box>
                       }
@@ -126,7 +145,7 @@ const DownloadsPage: React.FC = () => {
                         <IconButton 
                           onClick={() => startPausedDownload(download.id)}
                           color="success"
-                          title="Start Download"
+                          title="开始下载"
                         >
                           <PlayArrowIcon />
                         </IconButton>
@@ -134,7 +153,7 @@ const DownloadsPage: React.FC = () => {
                         <IconButton 
                           onClick={() => pauseActiveDownload(download.id)}
                           color="warning"
-                          title="Pause Download"
+                          title="暂停下载"
                         >
                           <PauseIcon />
                         </IconButton>
@@ -142,7 +161,7 @@ const DownloadsPage: React.FC = () => {
                       <IconButton 
                         onClick={() => removeDownload(download.id)}
                         color="error"
-                        title="Remove Download"
+                        title="移除下载"
                       >
                         <CloseIcon />
                       </IconButton>
@@ -161,7 +180,7 @@ const DownloadsPage: React.FC = () => {
           <List>
             {allCompletedDownloads.length === 0 ? (
               <Box textAlign="center" color="text.secondary" py={4}>
-                <Typography variant="body1">No completed downloads</Typography>
+                <Typography variant="body1">暂无完成的下载</Typography>
               </Box>
             ) : (
               paginatedCompletedDownloads.map((item: any) => {
@@ -202,7 +221,7 @@ const DownloadsPage: React.FC = () => {
                               )}
                               {date && (
                                 <Typography variant="caption" color="text.secondary" mt={0.5} component="span" display="block">
-                                  Downloaded on {date}
+                                  下载于 {date}
                                 </Typography>
                               )}
                               {name && !date && (
@@ -213,7 +232,7 @@ const DownloadsPage: React.FC = () => {
                             </>
                           ) : (
                             <Typography variant="body2" color="text.secondary" component="span">
-                              Failed • {name}
+                              失败 • {name}
                             </Typography>
                           )}
                         </Box>
