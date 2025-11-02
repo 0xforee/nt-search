@@ -23,12 +23,20 @@ if [ "$AUTO_UPDATE" = "true" ]; then
             git checkout "$GIT_BRANCH" 2>/dev/null || git checkout -b "$GIT_BRANCH"
             if git pull origin "$GIT_BRANCH"; then
                 echo "Successfully pulled latest code from $GIT_BRANCH"
+                # Print current commit info
+                COMMIT_SHORT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+                COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s" 2>/dev/null || echo "unknown")
+                echo "Updated to commit: $COMMIT_SHORT - $COMMIT_MESSAGE"
             else
                 echo "Warning: git pull failed, trying to clone fresh..."
                 cd /
                 # Clone to temporary directory
                 if git clone -b "$GIT_BRANCH" "$GIT_REPO_URL" /tmp/app_clone 2>/dev/null; then
                     echo "Successfully cloned fresh repository"
+                    # Print commit info from cloned repo
+                    COMMIT_SHORT=$(cd /tmp/app_clone && git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+                    COMMIT_MESSAGE=$(cd /tmp/app_clone && git log -1 --pretty=format:"%s" 2>/dev/null || echo "unknown")
+                    echo "Cloned commit: $COMMIT_SHORT - $COMMIT_MESSAGE"
                     # Remove old source code files
                     rm -rf /app/.git /app/src /app/public /app/index.html /app/vite.config.ts /app/tsconfig*.json /app/tailwind.config.js /app/postcss.config.js /app/eslint.config.js /app/README.md 2>/dev/null || true
                     
@@ -59,6 +67,10 @@ if [ "$AUTO_UPDATE" = "true" ]; then
             # Clone to temporary directory
             if git clone -b "$GIT_BRANCH" "$GIT_REPO_URL" /tmp/app_clone 2>/dev/null; then
                 echo "Successfully cloned repository"
+                # Print commit info from cloned repo
+                COMMIT_SHORT=$(cd /tmp/app_clone && git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+                COMMIT_MESSAGE=$(cd /tmp/app_clone && git log -1 --pretty=format:"%s" 2>/dev/null || echo "unknown")
+                echo "Cloned commit: $COMMIT_SHORT - $COMMIT_MESSAGE"
                 # Remove old source code files
                 rm -rf /app/.git /app/src /app/public /app/index.html /app/vite.config.ts /app/tsconfig*.json /app/tailwind.config.js /app/postcss.config.js /app/eslint.config.js /app/README.md 2>/dev/null || true
                 
@@ -86,6 +98,10 @@ if [ "$AUTO_UPDATE" = "true" ]; then
         echo "Pulling latest code from existing git repository..."
         if git pull; then
             echo "Successfully pulled latest code"
+            # Print current commit info
+            COMMIT_SHORT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+            COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s" 2>/dev/null || echo "unknown")
+            echo "Updated to commit: $COMMIT_SHORT - $COMMIT_MESSAGE"
         else
             echo "Warning: git pull failed, continuing with existing code"
         fi
@@ -107,6 +123,27 @@ if [ "$AUTO_UPDATE" = "true" ]; then
     cp -r dist/* /usr/share/nginx/html/
     
     echo "Build completed successfully!"
+    
+    # Print commit information after build
+    cd /app
+    if [ -d .git ]; then
+        echo "=========================================="
+        echo "Current Git Commit Information:"
+        echo "=========================================="
+        COMMIT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+        COMMIT_SHORT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+        COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s" 2>/dev/null || echo "unknown")
+        COMMIT_AUTHOR=$(git log -1 --pretty=format:"%an" 2>/dev/null || echo "unknown")
+        COMMIT_DATE=$(git log -1 --pretty=format:"%ci" 2>/dev/null || echo "unknown")
+        BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+        
+        echo "Branch: $BRANCH_NAME"
+        echo "Commit: $COMMIT_SHORT ($COMMIT_HASH)"
+        echo "Author: $COMMIT_AUTHOR"
+        echo "Date: $COMMIT_DATE"
+        echo "Message: $COMMIT_MESSAGE"
+        echo "=========================================="
+    fi
 else
     echo "AUTO_UPDATE is disabled. Using pre-built assets."
 fi
