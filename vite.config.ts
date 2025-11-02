@@ -8,15 +8,15 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-// Read version from version.py at build time
+// Read version from version.conf at build time
 function getVersion(): string {
   try {
-    const versionPath = resolve(__dirname, 'version.py')
+    const versionPath = resolve(__dirname, 'version.conf')
     const versionFile = readFileSync(versionPath, 'utf-8')
     const match = versionFile.match(/APP_VERSION\s*=\s*["']v?(.*?)["']/)
     return match ? match[1] : 'unknown'
   } catch (error) {
-    console.error('Error reading version from version.py:', error)
+    console.error('Error reading version from version.conf:', error)
     return 'unknown'
   }
 }

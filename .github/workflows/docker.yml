@@ -7,9 +7,7 @@ on:
       - main
       - master
     paths:
-      - 'src/**'
-      - 'version.py'
-      - 'docker/**'
+      - 'version.conf'
   pull_request:
     branches:
       - main
@@ -30,7 +28,7 @@ jobs:
       - name: Release version
         id: release_version
         run: |
-          app_version=$(cat version.py | sed -ne "s/APP_VERSION\s*=\s*[\"']v\?\(.*\)[\"']/\1/gp")
+          app_version=$(cat version.conf | sed -ne "s/APP_VERSION\s*=\s*[\"']v\?\(.*\)[\"']/\1/gp")
           echo "app_version=${app_version}" >> $GITHUB_ENV
           echo "version=${app_version}" >> $GITHUB_OUTPUT
       
