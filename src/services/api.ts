@@ -2,7 +2,6 @@ import { ApiResponse } from "../types/Response";
 import { apiRequest } from "./http-client";
 
 
-
 /**
  * search api
  */
@@ -40,7 +39,7 @@ async function searchTorrentsAsync(keyword: string) : Promise<ApiResponse<any>>{
         method: 'POST',
         urlEncoded: true,
         body: { search_word: keyword },
-        timeout: 30000
+        timeout: 100000
       });
       return response;
 }
