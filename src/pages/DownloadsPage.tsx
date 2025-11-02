@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDownload } from '../context/DownloadContext';
-import { Container, Box, Typography, LinearProgress, List, ListItem, ListItemText, ListItemIcon, IconButton, Pagination } from '@mui/material';
+import { Container, Box, Typography, LinearProgress, List, ListItem, ListItemText, ListItemIcon, IconButton, Pagination, Tabs, Tab } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import CloseIcon from '@mui/icons-material/Close';
@@ -21,25 +21,77 @@ const DownloadsPage: React.FC = () => {
   } = useDownload();
   
   const [historyPage, setHistoryPage] = useState(1);
+  const [currentTab, setCurrentTab] = useState(0);
+  const [completedPage, setCompletedPage] = useState(1);
+  const itemsPerPage = 10;
 
-  useEffect(() => {
-    
-  }, [activeDownloads])
+  // Combine local history and API history for completed downloads
+  const allCompletedDownloads = [...downloadHistory, ...apiDownloadHistory];
+  
+  // Calculate pagination for completed downloads
+  const totalCompletedPages = Math.ceil(allCompletedDownloads.length / itemsPerPage);
+  const paginatedCompletedDownloads = allCompletedDownloads.slice(
+    (completedPage - 1) * itemsPerPage,
+    completedPage * itemsPerPage
+  );
 
-  // Fetch active downloads and history when component mounts
   useEffect(() => {
     fetchActiveDownloads();
     fetchDownloadHistory(historyPage);
-    
-    // Removed automatic polling of 'download/now' endpoint
-    // Downloads will update only when user-initiated actions occur
   }, []);
 
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
+    // Reset to first page when switching tabs
+    if (newValue === 1) {
+      setCompletedPage(1);
+    }
+  };
+
+  const handleCompletedPageChange = (_: React.ChangeEvent<unknown>, value: number) => {
+    setCompletedPage(value);
+  };
+
   return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Active Downloads */}
-        <Box mb={4}>
-          <Typography variant="h6" component="h2" color="text.primary" mb={2}>Active Downloads</Typography>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Tabs */}
+      <Box sx={{ mb: 3 }}>
+        <Tabs
+          value={currentTab}
+          onChange={handleTabChange}
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            px: 2,
+            boxShadow: 2,
+            '& .MuiTab-root': {
+              fontSize: '0.95rem',
+              fontWeight: 600,
+              textTransform: 'none',
+              minHeight: 48,
+              py: 1.5,
+              px: 3,
+              '&.Mui-selected': {
+                color: 'primary.main',
+                fontWeight: 700,
+              },
+            },
+            '& .MuiTabs-indicator': {
+              height: 3,
+              borderRadius: '3px 3px 0 0',
+            },
+          }}
+        >
+          <Tab label={`正在下载 (${activeDownloads.length})`} />
+          <Tab label={`完成下载 (${allCompletedDownloads.length})`} />
+        </Tabs>
+      </Box>
+
+      {/* Active Downloads Tab */}
+      {currentTab === 0 && (
+        <Box>
           <List>
             {activeDownloads.length === 0 ? (
               <Box textAlign="center" color="text.secondary" py={4}>
@@ -103,19 +155,30 @@ const DownloadsPage: React.FC = () => {
             )}
           </List>
         </Box>
+      )}
 
-        {/* Local Download History */}
-        {downloadHistory.length > 0 && (
-          <Box mb={4}>
-            <Typography variant="h6" component="h2" color="text.primary" mb={2}>Recent Downloads</Typography>
-            <List>
-              {downloadHistory.map(download => {
-                const title = (download as any).title || 'Movie Title';
-                const image = (download as any).image || '';
-                const name = (download as any).name || '';
+      {/* Completed Downloads Tab */}
+      {currentTab === 1 && (
+        <Box>
+          <List>
+            {allCompletedDownloads.length === 0 ? (
+              <Box textAlign="center" color="text.secondary" py={4}>
+                <Typography variant="body1">No completed downloads</Typography>
+              </Box>
+            ) : (
+              paginatedCompletedDownloads.map((item: any) => {
+                const title = item.title || 'Movie Title';
+                const image = item.image || '';
+                const name = item.name || '';
+                const status = item.status || 'completed';
+                const date = item.date || '';
+                const mediaType = item.media_type || '';
+                const year = item.year || '';
+                const site = item.site || '';
+                const overview = item.overview || '';
                 
                 return (
-                  <ListItem key={download.id} sx={{ bgcolor: 'background.paper', borderRadius: 1, mb: 2, boxShadow: 1 }}>
+                  <ListItem key={item.id} sx={{ bgcolor: 'background.paper', borderRadius: 1, mb: 2, boxShadow: 1 }}>
                     <ListItemIcon>
                       {image ? (
                         <img src={image} alt={title} style={{ width: 40, height: 60, objectFit: 'cover', borderRadius: 4 }} />
@@ -126,16 +189,43 @@ const DownloadsPage: React.FC = () => {
                     <ListItemText
                       primary={<Typography variant="subtitle1" color="text.primary">{title}</Typography>}
                       secondary={
-                        <Typography variant="body2" color="text.secondary" component="span">
-                          {download.status === 'completed' ? 'Completed' : 'Failed'} • {name}
-                        </Typography>
+                        <Box>
+                          {status === 'completed' ? (
+                            <>
+                              {mediaType && (
+                                <Typography variant="body2" color="text.secondary" component="span">
+                                  {mediaType} • {year} • {site}
+                                </Typography>
+                              )}
+                              {overview && (
+                                <Typography variant="body2" color="text.secondary" mt={0.5} component="span" display="block">
+                                  {overview}
+                                </Typography>
+                              )}
+                              {date && (
+                                <Typography variant="caption" color="text.secondary" mt={0.5} component="span" display="block">
+                                  Downloaded on {date}
+                                </Typography>
+                              )}
+                              {name && !date && (
+                                <Typography variant="body2" color="text.secondary" component="span">
+                                  {name}
+                                </Typography>
+                              )}
+                            </>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary" component="span">
+                              Failed • {name}
+                            </Typography>
+                          )}
+                        </Box>
                       }
                       secondaryTypographyProps={{ component: 'div' }}
                     />
                     <Box>
-                      {download.status === 'failed' && (
+                      {status === 'failed' && (
                         <IconButton 
-                          onClick={() => retryDownload(download)}
+                          onClick={() => retryDownload(item)}
                           color="primary"
                         >
                           <ReplayIcon />
@@ -144,70 +234,25 @@ const DownloadsPage: React.FC = () => {
                     </Box>
                   </ListItem>
                 );
-              })}
-            </List>
-          </Box>
-        )}
-        
-        {/* API Download History */}
-        <Box>
-          <Typography variant="h6" component="h2" color="text.primary" mb={2}>Download History</Typography>
-          <List>
-            {apiDownloadHistory.length === 0 ? (
-              <Box textAlign="center" color="text.secondary" py={4}>
-                <Typography variant="body1">No download history</Typography>
-              </Box>
-            ) : (
-              apiDownloadHistory.map((item: any) => {
-                return (
-                  <ListItem key={item.id} sx={{ bgcolor: 'background.paper', borderRadius: 1, mb: 2, boxShadow: 1 }}>
-                    <ListItemIcon>
-                      {item.image ? (
-                        <img src={item.image} alt={item.title} style={{ width: 40, height: 60, objectFit: 'cover', borderRadius: 4 }} />
-                      ) : (
-                        <Box sx={{ width: 40, height: 60, bgcolor: 'grey.700', borderRadius: 4 }}></Box>
-                      )}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<Typography variant="subtitle1" color="text.primary">{item.title}</Typography>}
-                      secondary={
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" component="span">
-                            {item.media_type} • {item.year} • {item.site}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" mt={0.5} component="span">
-                            {item.overview}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary" mt={0.5} component="span">
-                            Downloaded on {item.date}
-                          </Typography>
-                        </Box>
-                      }
-                      secondaryTypographyProps={{ component: 'div' }}
-                    />
-                  </ListItem>
-                );
               })
             )}
-            
-            {/* Pagination */}
-            {apiDownloadHistory.length > 0 && totalHistoryPages > 1 && (
-              <Box display="flex" justifyContent="center" mt={3}>
-                <Pagination
-                  count={totalHistoryPages}
-                  page={historyPage}
-                  onChange={(_, value) => {
-                    setHistoryPage(value);
-                    fetchDownloadHistory(value);
-                  }}
-                  color="primary"
-                  sx={{'& .MuiPaginationItem-root': { color: 'text.primary' }}}
-                />
-              </Box>
-            )}
           </List>
+          
+          {/* Pagination for completed downloads */}
+          {totalCompletedPages > 1 && (
+            <Box display="flex" justifyContent="center" mt={3}>
+              <Pagination
+                count={totalCompletedPages}
+                page={completedPage}
+                onChange={handleCompletedPageChange}
+                color="primary"
+                sx={{'& .MuiPaginationItem-root': { color: 'text.primary' }}}
+              />
+            </Box>
+          )}
         </Box>
-      </Container>
+      )}
+    </Container>
   );
 };
 

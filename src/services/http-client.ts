@@ -53,9 +53,64 @@ export const updateApiBaseUrl = (newBaseUrl: string): void => {
   );
 
   axiosInstance.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      // Check if response data indicates 403 error
+      const responseData = response.data;
+      if (responseData && typeof responseData === 'object') {
+        const code = responseData.code;
+        const success = responseData.success;
+        const message = responseData.message || '';
+        
+        // Check for 403 error code or authentication failure
+        if (code === 403 || (success === false && message.includes('Token') || message.includes('认证'))) {
+          // Clear authentication token
+          localStorage.removeItem('auth_token');
+          
+          // Redirect to login page
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+          
+          return Promise.reject(new Error('Authentication failed. Please login again.'));
+        }
+      }
+      return response;
+    },
     (error) => {
-      const errorMessage = error.response?.data?.error || `API request failed with status ${error.response?.status || 'unknown'}`;
+      // Handle HTTP status 403
+      if (error.response?.status === 403) {
+        // Clear authentication token
+        localStorage.removeItem('auth_token');
+        
+        // Redirect to login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        
+        return Promise.reject(new Error('Authentication failed. Please login again.'));
+      }
+      
+      // Check response data for 403 error code
+      const responseData = error.response?.data;
+      if (responseData && typeof responseData === 'object') {
+        const code = responseData.code;
+        const success = responseData.success;
+        const message = responseData.message || '';
+        
+        if (code === 403 || (success === false && (message.includes('Token') || message.includes('认证')))) {
+          // Clear authentication token
+          localStorage.removeItem('auth_token');
+          
+          // Redirect to login page
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+          
+          return Promise.reject(new Error('Authentication failed. Please login again.'));
+        }
+      }
+      
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || `API request failed with status ${error.response?.status || 'unknown'}`;
       return Promise.reject(new Error(errorMessage));
     }
   );
@@ -81,9 +136,64 @@ axiosInstance.interceptors.request.use(
 
 // Response interceptor for handling errors
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Check if response data indicates 403 error
+    const responseData = response.data;
+    if (responseData && typeof responseData === 'object') {
+      const code = responseData.code;
+      const success = responseData.success;
+      const message = responseData.message || '';
+      
+      // Check for 403 error code or authentication failure
+      if (code === 403 || (success === false && (message.includes('Token') || message.includes('认证')))) {
+        // Clear authentication token
+        localStorage.removeItem('auth_token');
+        
+        // Redirect to login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        
+        return Promise.reject(new Error('Authentication failed. Please login again.'));
+      }
+    }
+    return response;
+  },
   (error) => {
-    const errorMessage = error.response?.data?.error || `API request failed with status ${error.response?.status || 'unknown'}`;
+    // Handle HTTP status 403
+    if (error.response?.status === 403) {
+      // Clear authentication token
+      localStorage.removeItem('auth_token');
+      
+      // Redirect to login page
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+      
+      return Promise.reject(new Error('Authentication failed. Please login again.'));
+    }
+    
+    // Check response data for 403 error code
+    const responseData = error.response?.data;
+    if (responseData && typeof responseData === 'object') {
+      const code = responseData.code;
+      const success = responseData.success;
+      const message = responseData.message || '';
+      
+      if (code === 403 || (success === false && (message.includes('Token') || message.includes('认证')))) {
+        // Clear authentication token
+        localStorage.removeItem('auth_token');
+        
+        // Redirect to login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        
+        return Promise.reject(new Error('Authentication failed. Please login again.'));
+      }
+    }
+    
+    const errorMessage = error.response?.data?.error || error.response?.data?.message || `API request failed with status ${error.response?.status || 'unknown'}`;
     return Promise.reject(new Error(errorMessage));
   }
 );
