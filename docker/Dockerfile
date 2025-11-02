@@ -58,8 +58,11 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-# Environment variable for auto-update (runtime)
-ENV AUTO_UPDATE=false
+# Environment variables for auto-update (runtime)
+# These defaults can be overridden by docker-compose environment variables or -e flags
+ENV AUTO_UPDATE=true
+ENV GIT_REPO_URL=https://github.com/0xforee/nt-search.git
+ENV GIT_BRANCH=main
 
 # Use entrypoint script
 ENTRYPOINT ["/docker-entrypoint.sh"]

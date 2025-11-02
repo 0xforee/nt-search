@@ -10,7 +10,9 @@ services:
       - "80:3000"
     environment:
       - NODE_ENV=production
-      - AUTO_UPDATE=${AUTO_UPDATE:-false}
+      - AUTO_UPDATE=${AUTO_UPDATE:-true}
+      - GIT_REPO_URL=${GIT_REPO_URL:-https://github.com/0xforee/nt-search.git}
+      - GIT_BRANCH=${GIT_BRANCH:-main}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]

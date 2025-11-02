@@ -8,16 +8,89 @@ if [ "$AUTO_UPDATE" = "true" ]; then
     # Navigate to app directory
     cd /app
     
-    # Pull latest code (if git is available and repo exists)
-    if [ -d .git ]; then
-        echo "Pulling latest code from git..."
+    # Determine git branch (default to main if not specified)
+    GIT_BRANCH=${GIT_BRANCH:-main}
+    
+    # Pull or clone latest code
+    if [ -n "$GIT_REPO_URL" ]; then
+        # If GIT_REPO_URL is set, clone from the repository
+        echo "Cloning code from git repository: $GIT_REPO_URL (branch: $GIT_BRANCH)"
+        if [ -d .git ]; then
+            # If .git exists, try to update remote and pull
+            echo "Git repository exists, updating..."
+            git remote set-url origin "$GIT_REPO_URL" 2>/dev/null || git remote add origin "$GIT_REPO_URL"
+            git fetch origin
+            git checkout "$GIT_BRANCH" 2>/dev/null || git checkout -b "$GIT_BRANCH"
+            if git pull origin "$GIT_BRANCH"; then
+                echo "Successfully pulled latest code from $GIT_BRANCH"
+            else
+                echo "Warning: git pull failed, trying to clone fresh..."
+                cd /
+                # Clone to temporary directory
+                if git clone -b "$GIT_BRANCH" "$GIT_REPO_URL" /tmp/app_clone 2>/dev/null; then
+                    echo "Successfully cloned fresh repository"
+                    # Remove old source code files
+                    rm -rf /app/.git /app/src /app/public /app/index.html /app/vite.config.ts /app/tsconfig*.json /app/tailwind.config.js /app/postcss.config.js /app/eslint.config.js /app/README.md 2>/dev/null || true
+                    
+                    # Copy source files from cloned repo (preserve node_modules and dist)
+                    cp -r /tmp/app_clone/.git /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/src /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/public /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/index.html /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/vite.config.ts /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/tsconfig*.json /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/tailwind.config.js /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/postcss.config.js /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/eslint.config.js /app/ 2>/dev/null || true
+                    cp -r /tmp/app_clone/package*.json /app/ 2>/dev/null || true
+                    
+                    # Clean up temporary clone
+                    rm -rf /tmp/app_clone
+                else
+                    echo "Error: Failed to clone repository, using existing code"
+                fi
+                cd /app
+            fi
+        else
+            # Clone fresh if .git doesn't exist
+            echo "Cloning fresh repository to temporary location..."
+            cd /
+            
+            # Clone to temporary directory
+            if git clone -b "$GIT_BRANCH" "$GIT_REPO_URL" /tmp/app_clone 2>/dev/null; then
+                echo "Successfully cloned repository"
+                # Remove old source code files
+                rm -rf /app/.git /app/src /app/public /app/index.html /app/vite.config.ts /app/tsconfig*.json /app/tailwind.config.js /app/postcss.config.js /app/eslint.config.js /app/README.md 2>/dev/null || true
+                
+                # Copy source files from cloned repo (preserve node_modules and dist)
+                cp -r /tmp/app_clone/.git /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/src /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/public /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/index.html /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/vite.config.ts /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/tsconfig*.json /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/tailwind.config.js /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/postcss.config.js /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/eslint.config.js /app/ 2>/dev/null || true
+                cp -r /tmp/app_clone/package*.json /app/ 2>/dev/null || true
+                
+                # Clean up temporary clone
+                rm -rf /tmp/app_clone
+            else
+                echo "Error: Failed to clone repository, using existing code"
+            fi
+        fi
+        cd /app
+    elif [ -d .git ]; then
+        # If .git exists but no GIT_REPO_URL, try git pull
+        echo "Pulling latest code from existing git repository..."
         if git pull; then
             echo "Successfully pulled latest code"
         else
             echo "Warning: git pull failed, continuing with existing code"
         fi
     else
-        echo "Warning: .git directory not found, skipping git pull"
+        echo "Warning: .git directory not found and GIT_REPO_URL not set, using existing code"
     fi
     
     # Install dependencies
