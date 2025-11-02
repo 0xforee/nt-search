@@ -52,11 +52,11 @@ COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # Expose port
-EXPOSE 3000
+EXPOSE 3030
 
 # Health check (nginx:alpine includes wget)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3030/health || exit 1
 
 # Environment variables for auto-update (runtime)
 # These defaults can be overridden by docker-compose environment variables or -e flags
