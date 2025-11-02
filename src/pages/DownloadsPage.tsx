@@ -80,7 +80,22 @@ const DownloadsPage: React.FC = () => {
                     secondary={
                       <Box>
                         <Typography variant="body2" color="text.secondary" component="span">{download.progress}% - {stateText} - {speedText}</Typography>
-                        <LinearProgress variant="determinate" value={download.progress} sx={{ mt: 0.5 }} />
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={download.progress} 
+                          sx={{ 
+                            mt: 0.5,
+                            height: 4,
+                            borderRadius: 4,
+                            backgroundColor: 'rgba(114, 112, 112, 0.2)',
+                            '& .MuiLinearProgress-bar': {
+                              borderRadius: 4,
+                              backgroundColor: state === 'paused' || state === 'Stoped' 
+                                ? 'warning.main' 
+                                : 'primary.main'
+                            }
+                          }} 
+                        />
                       </Box>
                     }
                     secondaryTypographyProps={{ component: 'div' }}

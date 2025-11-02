@@ -66,6 +66,7 @@ export async function initiateDownload(resourceId: string): Promise<DownloadSear
   return apiRequest<DownloadSearchResponse>('/download/search', {
     method: 'POST',
     urlEncoded: true,
+    timeout: 30000,
     body: { id: resourceId }
   });
 }
