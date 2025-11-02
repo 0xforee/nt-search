@@ -15,12 +15,10 @@ const DownloadsPage: React.FC = () => {
     removeDownload,
     fetchActiveDownloads,
     fetchDownloadHistory,
-    totalHistoryPages,
     startPausedDownload,
     pauseActiveDownload
   } = useDownload();
   
-  const [historyPage, setHistoryPage] = useState(1);
   const [currentTab, setCurrentTab] = useState(0);
   const [completedPage, setCompletedPage] = useState(1);
   const itemsPerPage = 10;
@@ -37,7 +35,7 @@ const DownloadsPage: React.FC = () => {
 
   useEffect(() => {
     fetchActiveDownloads();
-    fetchDownloadHistory(historyPage);
+    fetchDownloadHistory(1);
   }, []);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
