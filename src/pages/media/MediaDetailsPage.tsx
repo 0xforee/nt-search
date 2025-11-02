@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
 import { MovieDetails, MovieDetailsResponse } from '../../types';
 import { apiRequest } from '../../services/http-client';
 import {
@@ -68,34 +67,30 @@ const MediaDetailsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <MainLayout>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
-          <CircularProgress color="primary" size={60} />
-          <Typography variant="h6" color="text.primary" ml={2}>正在加载电影详情...</Typography>
-        </Box>
-      </MainLayout>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
+        <CircularProgress color="primary" size={60} />
+        <Typography variant="h6" color="text.primary" ml={2}>正在加载电影详情...</Typography>
+      </Box>
     );
   }
 
   if (error || !movie) {
     return (
-      <MainLayout>
-        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
-          <Typography variant="h6" color="error" mb={2}>{error || '电影未找到'}</Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate(-1)}
-          >
-            返回
-          </Button>
-        </Box>
-      </MainLayout>
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
+        <Typography variant="h6" color="error" mb={2}>{error || '电影未找到'}</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate(-1)}
+        >
+          返回
+        </Button>
+      </Box>
     );
   }
 
   return (
-    <MainLayout title={movie.title}>
+    <>
       <Box sx={{ position: 'relative' }}>
         {/* Background Image with Gradient Overlay */}
         <Box
@@ -214,7 +209,7 @@ const MediaDetailsPage: React.FC = () => {
           </Container>
         </Box>
       </Box>
-    </MainLayout>
+    </>
   );
 };
 

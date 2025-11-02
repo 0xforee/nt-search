@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { RspSearchItem } from '../services/api';
+import { RspSearchItem, MediaTorrentsAPIResponse } from '../services/api';
 import { MovieData } from '../types';
 
 interface SearchContextType {
@@ -7,6 +7,8 @@ interface SearchContextType {
   setSearchResults: (results: RspSearchItem[]) => void;
   movieResources: Record<string, MovieData>;
   setMovieResources: (movieId: string, data: MovieData) => void;
+  torrentResults: Record<string, MediaTorrentsAPIResponse | null>;
+  setTorrentResults: (movieId: string, data: MediaTorrentsAPIResponse | null) => void;
   clearSearchResults: () => void;
   clearMovieResources: () => void;
 }
@@ -24,9 +26,17 @@ export const useSearch = () => {
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [searchResults, setSearchResults] = useState<RspSearchItem[]>([]);
   const [movieResources, setMovieResourcesState] = useState<Record<string, MovieData>>({});
+  const [torrentResults, setTorrentResultsState] = useState<Record<string, MediaTorrentsAPIResponse | null>>({});
 
   const setMovieResources = (movieId: string, data: MovieData) => {
     setMovieResourcesState(prev => ({
+      ...prev,
+      [movieId]: data
+    }));
+  };
+
+  const setTorrentResults = (movieId: string, data: MediaTorrentsAPIResponse | null) => {
+    setTorrentResultsState(prev => ({
       ...prev,
       [movieId]: data
     }));
@@ -47,6 +57,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSearchResults,
         movieResources,
         setMovieResources,
+        torrentResults,
+        setTorrentResults,
         clearSearchResults,
         clearMovieResources
       }}

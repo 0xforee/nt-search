@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDownload } from '../context/DownloadContext';
 import { useAuth } from '../context/AuthContext';
-import { AppBar, Toolbar, IconButton, Typography, Box, Menu, MenuItem, Fab, Badge, useTheme } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Box, Menu, MenuItem, Fab, Badge } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -16,7 +16,6 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useTheme();
   const { activeDownloads } = useDownload();
   const { logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -40,9 +39,18 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
-      <AppBar position="fixed" sx={{ bgcolor: 'background.paper' }}>
-        <Toolbar>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', bgcolor: 'background.default', overflow: 'hidden' }}>
+      <AppBar 
+        position="static" 
+        elevation={0}
+        sx={{ 
+          bgcolor: 'background.paper',
+          flexShrink: 0,
+          borderBottom: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Toolbar disableGutters sx={{ px: 2 }}>
           {showNavBar && (
             <IconButton
               size="large"
@@ -94,7 +102,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         </Toolbar>
       </AppBar>
 
-      <Box component="main" sx={{ flexGrow: 1, pt: `${theme.mixins.toolbar.minHeight}px`, pb: 4 }}>
+      <Box 
+        component="main" 
+        sx={{ 
+          flexGrow: 1, 
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          pb: 4,
+          position: 'relative'
+        }}
+      >
         {children}
       </Box>
 
@@ -102,7 +119,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, title }) => {
         <Fab
           color="primary"
           aria-label="downloads"
-          sx={{ position: 'fixed', bottom: 16, right: 16 }}
+          sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }}
           onClick={() => navigate('/downloads')}
         >
           <Badge badgeContent={activeDownloads.length} color="error">

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
 import { searchMedia } from '../../services/api';
 // import { apiRequest } from '../../services/http-client';
 import { RspSearchItem } from '../../services/api';
@@ -77,38 +76,34 @@ const SearchResultsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <MainLayout title={`"${searchTitle}" 的搜索结果`}>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
-          <Box display="flex" alignItems="center" gap={2}>
-            <CircularProgress size={32} />
-            <Typography variant="body1" color="text.primary">正在加载结果...</Typography>
-          </Box>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
+        <Box display="flex" alignItems="center" gap={2}>
+          <CircularProgress size={32} />
+          <Typography variant="body1" color="text.primary">正在加载结果...</Typography>
         </Box>
-      </MainLayout>
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <MainLayout title={`"${searchTitle}" 的搜索结果`}>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
-          <Box textAlign="center">
-            <Typography variant="body1" color="error" mb={2}>{error}</Typography>
-            <Button 
-              onClick={() => window.location.reload()}
-              variant="contained"
-              color="primary"
-            >
-              重试
-            </Button>
-          </Box>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 8rem)">
+        <Box textAlign="center">
+          <Typography variant="body1" color="error" mb={2}>{error}</Typography>
+          <Button 
+            onClick={() => window.location.reload()}
+            variant="contained"
+            color="primary"
+          >
+            重试
+          </Button>
         </Box>
-      </MainLayout>
+      </Box>
     );
   }
 
   return (
-    <MainLayout title={`"${searchTitle}" 的搜索结果`}>
+    <>
       <Container maxWidth="lg">
         {searchResults.length === 0 ? (
           <Box textAlign="center" color="text.secondary">
@@ -167,7 +162,7 @@ const SearchResultsPage: React.FC = () => {
           </Box>
         )}
       </Container>
-    </MainLayout>
+    </>
   );
 };
 

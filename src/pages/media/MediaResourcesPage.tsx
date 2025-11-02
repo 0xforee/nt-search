@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useDownload } from '../../context/DownloadContext';
 import { useSearch } from '../../context/SearchContext';
-import MainLayout from '../../layouts/MainLayout';
 import { searchTorrentsAsync, getSearchTorrents, TorrentInfo } from '../../services/api';
 import { MovieData } from '../../types';
 import { processMovieResources, ProcessedMovieResources, GroupedResources, findRecommendedResource } from '../../utils/movieUtils';
@@ -38,7 +37,7 @@ const MediaResourcesPage: React.FC = () => {
   const location = useLocation();
   const { startDownload } = useDownload();
   const [movie, setMovie] = useState<MovieData | null>(null);
-  const { setMovieResources } = useSearch();
+  const { setMovieResources, movieResources, torrentResults, setTorrentResults } = useSearch();
   const [resources, setResources] = useState<TorrentInfo[]>([]);
   const [processedResources, setProcessedResources] = useState<ProcessedMovieResources | null>(null);
   const [selectedTab, setSelectedTab] = useState<keyof GroupedResources>('4k');
@@ -60,29 +59,35 @@ const MediaResourcesPage: React.FC = () => {
     const fetchMovieResources = async () => {
       if (!id) return;
 
+      // Try to get movie data from cache first
+      let currentMovie = location.state?.movie || movieResources[id];
+      
+      // If no movie data available, try to get from cache or show error
+      if (!currentMovie) {
+        setError('未找到电影数据，请从有效的电影页面导航。');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Set the movie data
+      setMovieResources(id, currentMovie);
+      setMovie(currentMovie);
+
+      // Check if we have cached torrent results
+      const cachedTorrentResults = torrentResults[id];
+      
+      if (cachedTorrentResults) {
+        // Use cached results
+        processTorrentResults(cachedTorrentResults);
+        setIsLoading(false);
+        return;
+      }
+
+      // No cache, fetch from API
       setIsLoading(true);
       setError(null);
 
       try {
-        // Check if movie data was passed via location state
-        const passedMovie = location.state?.movie;
-        let currentMovie = passedMovie;
-
-        if (!currentMovie && id) {
-          // If no movie data passed via state, we can't proceed without it.
-          // This scenario should ideally be handled by navigating from a page
-          // that provides movie data (e.g., search results or movie details).
-          throw new Error('未找到电影数据，请从有效的电影页面导航。');
-        }
-        
-        if(!currentMovie) {
-          throw new Error('需要电影ID或未找到电影数据');
-        }
-        
-        // Set the movie data
-        setMovieResources(id, currentMovie);
-        setMovie(currentMovie);
-
         // Extract search keyword from movie title
         const keyword = currentMovie.title;
 
@@ -93,60 +98,71 @@ const MediaResourcesPage: React.FC = () => {
         const searchResults = await getSearchTorrents();
         
         if (searchResults.success && searchResults.data) {
-          // Find recommended resource
-          const recommended = findRecommendedResource(searchResults);
-          setRecommendedResource(recommended);
+          // Cache the results
+          setTorrentResults(id, searchResults);
           
-          // Determine if it's a movie or TV show by checking type_key from search results
-          // Get the first result to check type_key (MovieTorrentResource)
-          const firstResult = Object.values(searchResults.data.result)[0];
-          const isMovie = firstResult?.type_key === 'MOV' || firstResult?.type === '电影';
-          
-          if (isMovie) {
-            // Process movie resources
-            const processed = processMovieResources(searchResults);
-            setProcessedResources(processed);
-            
-            // Set initial resources based on seeders availability
-            if (processed.hasResources) {
-              // Get resources from the first available tab
-              const tabs: (keyof GroupedResources)[] = ['4k', '2k', '1080p', 'other'];
-              let initialTab = tabs.find(tab => processed.groupedResources[tab].length > 0);
-              
-              if (initialTab) {
-                setSelectedTab(initialTab);
-                // Filter out recommended resource from the list
-                const filteredResources = processed.groupedResources[initialTab].filter(
-                  (resource) => !recommended || resource.id !== recommended.id
-                );
-                setResources(filteredResources);
-              } else {
-                // This shouldn't happen if hasResources is true, but handle it
-                setResources([]);
-              }
-            } else {
-              // No resources found
-              setResources([]);
-            }
-          } else {
-            // Process TV resources (temporarily return original)
-            const tvResources = processTVResources(searchResults);
-            setResources(tvResources);
-          }
+          // Process the results
+          processTorrentResults(searchResults);
         } else {
           setError('未找到此电影的种子资源');
+          setTorrentResults(id, null);
         }
         
       } catch (err) {
         setError('加载资源失败，请重试');
         console.error('Movie resources error:', err);
+        setTorrentResults(id, null);
       } finally {
         setIsLoading(false);
       }
     };
 
+    const processTorrentResults = (searchResults: any) => {
+      if (!searchResults.success || !searchResults.data) {
+        setError('未找到此电影的种子资源');
+        return;
+      }
+
+      // Find recommended resource
+      const recommended = findRecommendedResource(searchResults);
+      setRecommendedResource(recommended);
+      
+      // Determine if it's a movie or TV show by checking type_key from search results
+      const firstResult = Object.values(searchResults.data.result)[0] as any;
+      const isMovie = firstResult?.type_key === 'MOV' || firstResult?.type === '电影';
+      
+      if (isMovie) {
+        // Process movie resources
+        const processed = processMovieResources(searchResults);
+        setProcessedResources(processed);
+        
+        // Set initial resources based on seeders availability
+        if (processed.hasResources) {
+          const tabs: (keyof GroupedResources)[] = ['4k', '2k', '1080p', 'other'];
+          let initialTab = tabs.find(tab => processed.groupedResources[tab].length > 0);
+          
+          if (initialTab) {
+            setSelectedTab(initialTab);
+            const filteredResources = processed.groupedResources[initialTab].filter(
+              (resource) => !recommended || resource.id !== recommended.id
+            );
+            setResources(filteredResources);
+          } else {
+            setResources([]);
+          }
+        } else {
+          setResources([]);
+        }
+      } else {
+        // Process TV resources
+        const tvResources = processTVResources(searchResults);
+        setResources(tvResources);
+      }
+    };
+
     fetchMovieResources();
-  }, [id, searchParams, location.state]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, searchParams]);
 
 
   const handleDownload = async (resource: TorrentInfo) => {
@@ -184,52 +200,48 @@ const MediaResourcesPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <MainLayout>
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          minHeight="calc(100vh - 8rem)"
-        >
-          <Box display="flex" alignItems="center" gap={2}>
-            <CircularProgress size={30} />
-            <Typography variant="h6" color="text.secondary">
-              正在加载资源...
-            </Typography>
-          </Box>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="calc(100vh - 8rem)"
+      >
+        <Box display="flex" alignItems="center" gap={2}>
+          <CircularProgress size={30} />
+          <Typography variant="h6" color="text.secondary">
+            正在加载资源...
+          </Typography>
         </Box>
-      </MainLayout>
+      </Box>
     );
   }
 
   if (error || !movie) {
     return (
-      <MainLayout>
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          minHeight="calc(100vh - 8rem)"
-        >
-          <Box textAlign="center">
-            <Typography variant="body1" color="error" mb={2}>
-              {error || '电影未找到'}
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<ArrowBackIcon />}
-              onClick={() => navigate(-1)}
-            >
-              返回
-            </Button>
-          </Box>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="calc(100vh - 8rem)"
+      >
+        <Box textAlign="center">
+          <Typography variant="body1" color="error" mb={2}>
+            {error || '电影未找到'}
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate(-1)}
+          >
+            返回
+          </Button>
         </Box>
-      </MainLayout>
+      </Box>
     );
   }
 
   return (
-    <MainLayout title={`"${movie.title}" 的资源`}>
+    <>
       <Container maxWidth="md">
         {/* Movie Header */}
         <Box sx={{ position: 'relative', mb: 4 }}>
@@ -680,7 +692,7 @@ const MediaResourcesPage: React.FC = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </MainLayout>
+    </>
   );
 };
 
